@@ -25,14 +25,6 @@ jobs:
           template: ./infrastructure/main.bicep
           failOnStdErr: false
 
-      - name: Assign RBAC Role
-        uses: azure/cli@v1
-        with:
-          inlineScript: |
-            az role assignment create \
-              --assignee ${{ steps.deploy.outputs.managedIdentityPrincipalId }} 
-              --role "Cognitive Services User" 
-              --scope "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}
 
       # Beispiel für Verwendung des Outputs im nächsten Step
       - name: Show Principal ID
