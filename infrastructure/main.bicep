@@ -96,5 +96,5 @@ resource openAIRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
 // Ausgabe Principal
 output managedIdentityPrincipalId string = webApp.identity.principalId
 // Ausgabe des Endpunkts und des Schlüssels
-output aiServiceEndpoint string = aiService.properties.endpoint
-output aiServiceKey string = listKeys(aiService.id, '2023-10-01-preview').key1
+//output aiServiceEndpoint string = aiService.properties.endpoint
+//output aiServiceKey string = listKeys(aiService.id, '2023-10-01-preview').key1
