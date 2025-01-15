@@ -11,6 +11,10 @@ param webAppName string = 'app-bcl-reviewer'
 resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   name: appServicePlanName
   location: location
+  kind: 'linux'
+  properties: {
+    reserved: true
+  }
   sku: {
     name: 'B2'
     tier: 'Basic'
@@ -21,6 +25,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
 resource webApp 'Microsoft.Web/sites@2021-02-01' = {
   name: webAppName
   location: location
+  kind: 'app,linux'
   identity: {
     type: 'SystemAssigned'
   }
@@ -28,12 +33,11 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      pythonVersion: '3.11'
-      linuxFxVersion: 'PYTHON|3.11'
+      linuxFxVersion: 'PYTHON|3.11.0'
       alwaysOn: true
     }
   }
 }
 
-// Outputs für die Managed Identity Principal ID (wird für RBAC-Berechtigungen benötigt)
+// Outputs für die Managed Identity Principal ID
 output managedIdentityPrincipalId string = webApp.identity.principalId 
