@@ -2,10 +2,10 @@
 param location string = resourceGroup().location
 
 @description('Der Name des App Service Plans')
-param appServicePlanName string = 'asp-bcl-reviewer}'
+param appServicePlanName string = 'asp-bcl-reviewer'
 
 @description('Der Name der Web App')
-param webAppName string = 'app-bcl-reviewer}'
+param webAppName string = 'app-bcl-reviewer'
 
 // App Service Plan
 resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {

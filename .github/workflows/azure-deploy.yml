@@ -16,10 +16,25 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       
       - name: Deploy Bicep file
+        id: deploy
         uses: azure/arm-deploy@v1
         with:
           scope: resourcegroup
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./infrastructure/main.bicep
-          failOnStdErr: false 
+          failOnStdErr: false
+
+      - name: Assign RBAC Role
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az role assignment create \
+              --assignee ${{ steps.deploy.outputs.managedIdentityPrincipalId }} \
+              --role "Cognitive Services User" \
+              --scope "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/YOUR-RG/providers/Microsoft.CognitiveServices/accounts/YOUR-OPENAI-ACCOUNT"
+
+      # Beispiel für Verwendung des Outputs im nächsten Step
+      - name: Show Principal ID
+        run: |
+          echo "Die Principal ID ist: ${{ steps.deploy.outputs.managedIdentityPrincipalId }}" 
