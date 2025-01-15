@@ -34,7 +34,20 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
     httpsOnly: true
     siteConfig: {
       linuxFxVersion: 'PYTHON|3.12'
-      appCommandLine: 'python -m streamlit run main.py --server.port 8000 --server.address 0.0.0.0'
+      appSettings: [
+        {
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'true'
+        }
+        {
+          name: 'PYTHON_ENABLE_GUNICORN'
+          value: 'true'
+        }
+        {
+          name: 'WEBSITES_PORT'
+          value: '8000'
+        }
+      ]
       alwaysOn: true
     }
   }
