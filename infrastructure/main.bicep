@@ -33,7 +33,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      linuxFxVersion: 'PYTHON|3.11.0'
+      linuxFxVersion: 'PYTHON|3.12'
       appCommandLine: 'python -m streamlit run streamlit_app.py --server.port 8000 --server.address 0.0.0.0'
       alwaysOn: true
     }
