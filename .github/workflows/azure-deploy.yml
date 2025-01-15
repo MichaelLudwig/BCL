@@ -30,11 +30,11 @@ jobs:
         with:
           inlineScript: |
             az role assignment create \
-              --assignee ${{ steps.deploy.outputs.managedIdentityPrincipalId }} \
-              --role "Cognitive Services User" \
-              --scope "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}/resourceGroups/YOUR-RG/providers/Microsoft.CognitiveServices/accounts/YOUR-OPENAI-ACCOUNT"
+              --assignee ${{ steps.deploy.outputs.managedIdentityPrincipalId }} 
+              --role "Cognitive Services User" 
+              --scope "/subscriptions/${{ secrets.AZURE_SUBSCRIPTION }}
 
       # Beispiel für Verwendung des Outputs im nächsten Step
       - name: Show Principal ID
         run: |
-          echo "Die Principal ID ist: ${{ steps.deploy.outputs.managedIdentityPrincipalId }}" 
+          echo "Die App ServicePrincipal ID ist: ${{ steps.deploy.outputs.managedIdentityPrincipalId }}" 
