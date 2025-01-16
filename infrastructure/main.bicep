@@ -63,7 +63,7 @@ resource aiService 'Microsoft.CognitiveServices/accounts@2024-06-01-preview' = {
 }
 
 // Bereitstellung des GPT-4o Mini Modells
-//resource openAIModel 'Microsoft.CognitiveServices/accounts/deployments@2023-10-01-preview' = {
+//resource openAIModel 'Microsoft.CognitiveServices/accounts/deployments@2024-06-01-preview' = {
 //  parent: aiService
 //  name: 'gpt-4o-mini'
 //  sku: {
@@ -98,4 +98,4 @@ output managedIdentityPrincipalId string = webApp.identity.principalId
 // Ausgabe des Endpunkts und des Schlüssels
 //output aiServiceEndpoint string = aiService.properties.endpoint
 //output aiServiceKey string = listKeys(aiService.id, '2023-10-01-preview').key1
-//az cognitiveservices account list-models --name aiservice-bcl-reviewer --resource-group rg-ai-cloud-architecture
+
