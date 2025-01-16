@@ -46,7 +46,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
 }
 
 // Azure AI Services Multi-Service Account erstellen
-resource aiService 'Microsoft.CognitiveServices/accounts@2024-06-01-preview' = {
+resource aiService 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   name: aiServiceName
   location: location
   kind: 'AIServices'
@@ -63,22 +63,22 @@ resource aiService 'Microsoft.CognitiveServices/accounts@2024-06-01-preview' = {
 }
 
 // Bereitstellung des GPT-4o Mini Modells
-resource openAIModel 'Microsoft.CognitiveServices/accounts/deployments@2024-06-01-preview' = {
-  parent: aiService
-  name: 'gpt-4o-mini'
-  sku: {
-    name: 'Standard'
-    capacity: 1
-  }
-  properties: {
-    model: {
-      format: 'OpenAI'
-      name: 'gpt-4o-mini'
-      version: '2023-03-15-preview'
-    }
-    raiPolicyName: 'Microsoft.Default'
-  }
-}
+//resource openAIModel 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+//  parent: aiService
+//  name: 'gpt-4o-mini'
+//  sku: {
+//    name: 'Standard'
+//    capacity: 1
+//  }
+//  properties: {
+//    model: {
+//      format: 'OpenAI'
+//      name: 'gpt-4o-mini'
+//      version: '2023-03-15-preview'
+//    }
+//    raiPolicyName: 'Microsoft.Default'
+//  }
+//}
 
 
 
