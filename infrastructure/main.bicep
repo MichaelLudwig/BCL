@@ -7,7 +7,7 @@ param appServicePlanName string = 'asp-bcl-reviewer'
 @description('Der Name der Web App')
 param webAppName string = 'app-bcl-reviewer'
 
-@description('Der Name des AI Services Account')
+@description('Der Name des Azure OpenAI Services')
 param aiServiceName string = 'ai-service-bcl-reviewer'
 
 @description('Der Name des VNets')
@@ -16,7 +16,7 @@ param vnetName string = 'vnet-bcl-reviewer'
 @description('Das Subnetz für den Private Endpoint')
 param privateEndpointSubnetName string = 'subnet-private-endpoint'
 
-@description('Das Subnetz für App Service VNet-Integration')
+@description('Das Subnetz für die App Service VNet-Integration')
 param appServiceSubnetName string = 'subnet-appservice'
 
 // VNet mit Subnetzen erstellen
@@ -32,7 +32,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
         name: privateEndpointSubnetName
         properties: {
           addressPrefix: '10.0.1.0/24'
-          privateEndpointNetworkPolicies: 'Disabled'
+          privateEndpointNetworkPolicies: 'Disabled' // Erforderlich für Private Endpoint
         }
       }
       {
@@ -53,7 +53,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
   }
 }
 
-// App Service Plan
+// App Service Plan erstellen
 resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   name: appServicePlanName
   location: location
@@ -67,7 +67,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2021-02-01' = {
   }
 }
 
-// Web App mit VNet-Integration
+// Web App mit VNet-Integration erstellen
 resource webApp 'Microsoft.Web/sites@2021-02-01' = {
   name: webAppName
   location: location
@@ -80,38 +80,32 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
     httpsOnly: true
     siteConfig: {
       linuxFxVersion: 'PYTHON|3.12'
-      appCommandLine: '/bin/bash startup.sh'
       alwaysOn: true
-      scmType: 'None'
       appSettings: [
         {
-          name: 'AZURE_OPENAI_API_KEY'
-          value: listKeys(aiService.id, aiService.apiVersion).key1
+          name: 'USE_MANAGED_IDENTITY'
+          value: 'true'
         }
       ]
     }
-    virtualNetworkSubnetId: vnet.properties.subnets[1].id // Verknüpft mit Subnetz für App Service
+    virtualNetworkSubnetId: vnet.properties.subnets[1].id // Subnetz für App Service
   }
 }
 
-// Azure AI Services Multi-Service Account erstellen
+// Azure OpenAI Service erstellen
 resource aiService 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   name: aiServiceName
   location: location
-  kind: 'AIServices'
+  kind: 'OpenAI'
   sku: {
     name: 'S0'
   }
   properties: {
-    customSubDomainName: aiServiceName
     publicNetworkAccess: 'Disabled' // Verhindert öffentlichen Zugriff
-    apiProperties: {
-      statisticsEnabled: false
-    }
   }
 }
 
-// Private Endpoint für OpenAI Service
+// Private Endpoint für Azure OpenAI Service erstellen
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' = {
   name: '${aiServiceName}-pe'
   location: location
@@ -133,27 +127,27 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' = {
   }
 }
 
-// Private DNS Zone
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2023-02-01' = {
+// Private DNS Zone erstellen
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
   name: 'privatelink.openai.azure.com'
-  location: location
+  location: 'global'
   properties: {}
 }
 
-// Link DNS Zone mit VNet
-resource dnsZoneLink 'Microsoft.Network/virtualNetworks@2023-02-01' = {
-  name: '${vnetName}-link'
+// DNS-Zonenlink mit VNet verbinden
+resource dnsZoneLink 'Microsoft.Network/privateDnsZoneVirtualNetworkLinks@2024-06-01' = {
+  name: '${vnetName}-dns-link'
+  location: 'global'
   properties: {
-    virtualNetwork: {
-      id: vnet.id
-    }
+    virtualNetwork: vnet.id
     registrationEnabled: false
   }
 }
 
-// DNS-Eintrag für Private Endpoint
+// DNS-Zonengruppe für den Private Endpoint erstellen
 resource privateDnsZoneGroup 'Microsoft.Network/privateDnsZoneGroups@2023-02-01' = {
   name: 'default'
+  parent: privateEndpoint
   properties: {
     privateDnsZoneConfigs: [
       {
@@ -164,12 +158,9 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateDnsZoneGroups@2023-02-01'
       }
     ]
   }
-  dependsOn: [
-    privateEndpoint
-  ]
 }
 
-// RBAC-Zuweisung für Web App zur OpenAI-Nutzung
+// RBAC-Zuweisung für Web App zur Azure OpenAI-Nutzung
 resource openAIRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(webApp.id, aiService.id, 'Cognitive Services User')
   scope: aiService
@@ -179,4 +170,3 @@ resource openAIRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
     principalType: 'ServicePrincipal'
   }
 }
-
