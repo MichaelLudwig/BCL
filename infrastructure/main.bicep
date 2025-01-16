@@ -8,7 +8,7 @@ param appServicePlanName string = 'asp-bcl-reviewer'
 param webAppName string = 'app-bcl-reviewer'
 
 @description('Der Name des AI Services Account')
-param aiServiceName string = 'aiservice-bcl-reviewer'
+param aiServiceName string = 'ai-service-bcl-reviewer'
 
 
 // App Service Plan
