@@ -101,6 +101,7 @@ resource aiService 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
     name: 'S0'
   }
   properties: {
+    customSubDomainName: aiServiceName
     publicNetworkAccess: 'Disabled' // Verhindert öffentlichen Zugriff
   }
 }
