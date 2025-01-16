@@ -13,7 +13,7 @@ token_provider = get_bearer_token_provider(
 )
 client = openai.AzureOpenAI(
     azure_ad_token_provider=token_provider,
-    api_version="2024-10-01",
+    api_version="2024-07-18",
     azure_endpoint="https://ai-service-bcl-reviewer.openai.azure.com/"        
 )
 openAI_model = "gpt-4o-mini"
