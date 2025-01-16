@@ -25,23 +25,21 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-02-01' = {
   location: location
   properties: {
     addressSpace: {
-      addressPrefixes: [
-        '10.0.0.0/16'
-      ]
+      addressPrefixes: ['10.0.0.0/16']
     }
     subnets: [
       {
         name: privateEndpointSubnetName
         properties: {
           addressPrefix: '10.0.1.0/24'
-          privateEndpointNetworkPolicies: 'Disabled' // Erforderlich für Private Endpoint
+          privateEndpointNetworkPolicies: 'Disabled'
         }
       }
       {
         name: appServiceSubnetName
         properties: {
           addressPrefix: '10.0.2.0/24'
-          delegation: [
+          delegations: [
             {
               name: 'delegation-appservice'
               properties: {
@@ -91,10 +89,8 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
           value: listKeys(aiService.id, aiService.apiVersion).key1
         }
       ]
-      vnetRouteAllEnabled: true // Aktiviert den gesamten Datenverkehr über das VNet
     }
-    vnetRouteAllEnabled: true
-    vnetSubnetId: vnet.properties.subnets[1].id // Verknüpft das App Service Subnetz
+    virtualNetworkSubnetId: vnet.properties.subnets[1].id // Verknüpft mit Subnetz für App Service
   }
 }
 
@@ -146,7 +142,6 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2023-02-01' = {
 
 // Link DNS Zone mit VNet
 resource dnsZoneLink 'Microsoft.Network/virtualNetworks@2023-02-01' = {
-  parent: privateDnsZone
   name: '${vnetName}-link'
   properties: {
     virtualNetwork: {
@@ -158,7 +153,6 @@ resource dnsZoneLink 'Microsoft.Network/virtualNetworks@2023-02-01' = {
 
 // DNS-Eintrag für Private Endpoint
 resource privateDnsZoneGroup 'Microsoft.Network/privateDnsZoneGroups@2023-02-01' = {
-  parent: privateEndpoint
   name: 'default'
   properties: {
     privateDnsZoneConfigs: [
@@ -170,6 +164,9 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateDnsZoneGroups@2023-02-01'
       }
     ]
   }
+  dependsOn: [
+    privateEndpoint
+  ]
 }
 
 // RBAC-Zuweisung für Web App zur OpenAI-Nutzung
