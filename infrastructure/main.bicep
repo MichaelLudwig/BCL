@@ -46,7 +46,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
 }
 
 // Azure AI Services Multi-Service Account erstellen
-resource aiService 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
+resource aiService 'Microsoft.CognitiveServices/accounts@2024-06-01-preview' = {
   name: aiServiceName
   location: location
   kind: 'AIServices'
