@@ -49,7 +49,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
 resource aiService 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
   name: aiServiceName
   location: location
-  kind: 'AIServices'
+  kind: 'OpenAI'
   sku: {
     name: 'S0'
   }
