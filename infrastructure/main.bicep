@@ -49,7 +49,7 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
 resource aiService 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
   name: aiServiceName
   location: location
-  kind: 'OpenAI'
+  kind: 'AIServices'
   sku: {
     name: 'S0'
   }
@@ -63,22 +63,22 @@ resource aiService 'Microsoft.CognitiveServices/accounts@2023-10-01-preview' = {
 }
 
 // Bereitstellung des GPT-4o Mini Modells
-resource openAIModel 'Microsoft.CognitiveServices/accounts/deployments@2023-10-01-preview' = {
-  parent: aiService
-  name: 'gpt-4o-mini'
-  sku: {
-    name: 'Standard'
-    capacity: 1
-  }
-  properties: {
-    model: {
-      format: 'OpenAI'
-      name: 'gpt-4o-mini'
-      version: '2023-03-15-preview'
-    }
-    raiPolicyName: 'Microsoft.Default'
-  }
-}
+//resource openAIModel 'Microsoft.CognitiveServices/accounts/deployments@2023-10-01-preview' = {
+//  parent: aiService
+//  name: 'gpt-4o-mini'
+//  sku: {
+//    name: 'Standard'
+//    capacity: 1
+//  }
+//  properties: {
+//    model: {
+//      format: 'OpenAI'
+//      name: 'gpt-4o-mini'
+//      version: '2023-03-15-preview'
+//    }
+//    raiPolicyName: 'Microsoft.Default'
+//  }
+//}
 
 
 
@@ -98,3 +98,4 @@ output managedIdentityPrincipalId string = webApp.identity.principalId
 // Ausgabe des Endpunkts und des Schlüssels
 //output aiServiceEndpoint string = aiService.properties.endpoint
 //output aiServiceKey string = listKeys(aiService.id, '2023-10-01-preview').key1
+az cognitiveservices account list-models --name <aiServiceName> --resource-group <resource-group-name>
