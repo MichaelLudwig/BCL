@@ -74,7 +74,7 @@ resource openAIModel 'Microsoft.CognitiveServices/accounts/deployments@2023-10-0
     model: {
       format: 'OpenAI'
       name: 'gpt-4o-mini'
-      version: 'latest'
+      version: '2023-03-15-preview'
     }
     raiPolicyName: 'Microsoft.Default'
   }
