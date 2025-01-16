@@ -1,2 +1,6 @@
 streamlit
-gunicorn
+streamlit-chat
+openai
+azure-identity
+python-docx
+python-dotenv
