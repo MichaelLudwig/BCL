@@ -136,7 +136,8 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 
 // DNS-Zonenlink mit VNet verbinden
 resource dnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  name: '${privateDnsZone.name}/${vnetName}-dns-link'
+  parent: privateDnsZone
+  name: '${vnetName}-dns-link'
   location: 'global'
   properties: {
     virtualNetwork: {
@@ -148,7 +149,8 @@ resource dnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020
 
 // DNS-Zonengruppe für den Private Endpoint erstellen
 resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-02-01' = {
-  name: '${privateEndpoint.name}/default'
+  parent: privateEndpoint
+  name: 'default'
   properties: {
     privateDnsZoneConfigs: [
       {
