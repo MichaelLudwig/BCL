@@ -8,14 +8,21 @@ st.set_page_config(layout="wide")
 
 # OpenAI API Aufruf -------------------------------------------------------------
 
-token_provider = get_bearer_token_provider(
-    DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
-)
-client = openai.AzureOpenAI(
-    azure_ad_token_provider=token_provider,
-    api_version="2024-07-18",
-    azure_endpoint="https://ai-service-bcl-reviewer.openai.azure.com/"        
-)
+if os.getenv('WEBSITE_INSTANCE_ID'):
+    token_provider = get_bearer_token_provider(
+        DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
+    )
+    client = openai.AzureOpenAI(
+        azure_ad_token_provider=token_provider,
+        api_version="2024-04-01-preview",
+        azure_endpoint="https://ai-service-bcl-reviewer.openai.azure.com/"        
+    )
+else:
+    client = openai.AzureOpenAI(
+        api_key='3Abe8KOdgK63NycwGr5vayPh8Ay9uyI1TWoaHV6IkzExuLaHbYhGJQQJ99BAACfhMk5XJ3w3AAAAACOGwz49',
+        api_version="2024-04-01-preview",
+        azure_endpoint="https://ai-service-bcl-reviewer.openai.azure.com/"
+    )
 openAI_model = "gpt-4o-mini"
 
 # Chat Interface -------------------------------------------------------------
@@ -57,3 +64,5 @@ if user_prompt:
     # display GPT-4o's response
     with st.chat_message("assistant"):
         st.markdown(assistant_response)
+
+        
