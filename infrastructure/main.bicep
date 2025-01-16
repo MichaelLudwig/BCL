@@ -41,6 +41,12 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
       appCommandLine: '/bin/bash startup.sh'
       alwaysOn: true
       scmType: 'None'
+      appSettings: [
+        {
+          name: 'AZURE_OPENAI_API_KEY'
+          value: listKeys(aiService.id, aiService.apiVersion).key1
+        }
+      ]
     }
   }
 }

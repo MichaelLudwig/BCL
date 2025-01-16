@@ -3,8 +3,12 @@ import openai
 from openai import OpenAI
 import os
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from dotenv import load_dotenv
 
 st.set_page_config(layout="wide")
+
+# Lade Umgebungsvariablen aus .env
+load_dotenv()
 
 # OpenAI API Aufruf -------------------------------------------------------------
 
@@ -19,7 +23,7 @@ if os.getenv('WEBSITE_INSTANCE_ID'):
     )
 else:
     client = openai.AzureOpenAI(
-        api_key='3Abe8KOdgK63NycwGr5vayPh8Ay9uyI1TWoaHV6IkzExuLaHbYhGJQQJ99BAACfhMk5XJ3w3AAAAACOGwz49',
+        api_key=os.getenv('AZURE_OPENAI_API_KEY'),
         api_version="2024-04-01-preview",
         azure_endpoint="https://ai-service-bcl-reviewer.openai.azure.com/"
     )
