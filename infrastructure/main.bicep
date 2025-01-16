@@ -98,4 +98,4 @@ output managedIdentityPrincipalId string = webApp.identity.principalId
 // Ausgabe des Endpunkts und des Schlüssels
 //output aiServiceEndpoint string = aiService.properties.endpoint
 //output aiServiceKey string = listKeys(aiService.id, '2023-10-01-preview').key1
-az cognitiveservices account list-models --name <aiServiceName> --resource-group <resource-group-name>
+//az cognitiveservices account list-models --name aiservice-bcl-reviewer --resource-group rg-ai-cloud-architecture
