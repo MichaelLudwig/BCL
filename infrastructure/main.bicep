@@ -128,30 +128,31 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' = {
 }
 
 // Private DNS Zone erstellen
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: 'privatelink.openai.azure.com'
   location: 'global'
   properties: {}
 }
 
 // DNS-Zonenlink mit VNet verbinden
-resource dnsZoneLink 'Microsoft.Network/privateDnsZoneVirtualNetworkLinks@2024-06-01' = {
-  name: '${vnetName}-dns-link'
+resource dnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  name: '${privateDnsZone.name}/${vnetName}-dns-link'
   location: 'global'
   properties: {
-    virtualNetwork: vnet.id
+    virtualNetwork: {
+      id: vnet.id
+    }
     registrationEnabled: false
   }
 }
 
 // DNS-Zonengruppe für den Private Endpoint erstellen
-resource privateDnsZoneGroup 'Microsoft.Network/privateDnsZoneGroups@2023-02-01' = {
-  name: 'default'
-  parent: privateEndpoint
+resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-02-01' = {
+  name: '${privateEndpoint.name}/default'
   properties: {
     privateDnsZoneConfigs: [
       {
-        name: 'zoneConfig'
+        name: 'config'
         properties: {
           privateDnsZoneId: privateDnsZone.id
         }
