@@ -35,6 +35,7 @@ jobs:
         with:
           app-name: 'app-bcl-reviewer'
           package: .
+          startup-command: '/bin/bash startup.sh'
           
       - name: Show Deployment URL
         run: |

@@ -106,6 +106,23 @@ resource aiService 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   }
 }
 
+// GPT-4 Modell Deployment
+resource gpt4Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+  parent: aiService
+  name: 'gpt-4-mini'
+  sku: {
+    name: 'Standard'
+    capacity: 1
+  }
+  properties: {
+    model: {
+      format: 'OpenAI'
+      name: 'gpt-4o-mini'
+      version: '2024-07-18'
+    }
+  }
+}
+
 // Private Endpoint für Azure OpenAI Service erstellen
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' = {
   name: '${aiServiceName}-pe'
@@ -130,7 +147,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' = {
 
 // Private DNS Zone erstellen
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.openai.azure.com'
+  name: 'privatelink.cognitiveservices.azure.com'
   location: 'global'
   properties: {}
 }
@@ -162,6 +179,9 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
       }
     ]
   }
+  dependsOn: [
+    dnsZoneLink
+  ]
 }
 
 // RBAC-Zuweisung für Web App zur Azure OpenAI-Nutzung

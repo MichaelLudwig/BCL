@@ -19,7 +19,7 @@ if os.getenv('WEBSITE_INSTANCE_ID'):
     client = openai.AzureOpenAI(
         azure_ad_token_provider=token_provider,
         api_version="2024-04-01-preview",
-        azure_endpoint="https://ai-service-bcl-reviewer.openai.azure.com/"        
+        azure_endpoint="https://ai-service-bcl-reviewer.privatelink.openai.azure.com/"        
     )
 else:
     st.write("Locale Testumgebung")
