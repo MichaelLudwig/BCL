@@ -1,0 +1,66 @@
+## Ressourcengruppe anlegen
+
+```
+az group create --name test4-azure-ai-chat --location swedencentral
+```
+
+## Service Prinicipal für Infrastruktur Deployment erstellen
+
+```
+az ad sp create-for-rbac --name "bicep-deployer4" --role "Contributor" --scopes /subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/test4-azure-ai-chat --sdk-auth
+```
+
+Ergebnis in GitHub Secrets als AZURE_CREDENTIALS hinterlegen
+
+Dem Prinzipal das zusätzliche Recht geben, dem App Service Zugriffsrechte auf den Azure OpenAI Service zu gewähren
+
+```
+az role assignment create --assignee 0def0389-e79a-4d21-96fa-22079a8c4256 --role "User Access Administrator" --scope /subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/test4-azure-ai-chat
+``` 
+
+## Service Prinicipal für App Deployment erstellen
+
+```
+az ad sp create-for-rbac --name "app-deployer4" --role "Website Contributor" --scopes /subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/test4-azure-ai-chat --sdk-auth
+```
+
+Ergebnis in GitHub Secrets als AZURE_APP_CREDENTIALS hinterlegen
+
+## GitHub Actions Secrets hinterlegen
+
+AZURE_CREDENTIALS = siehe oben  
+AZURE_APP_CREDENTIALS = siehe oben
+AZURE_RG = test4-azure-ai-chat
+AZURE_SUBSCRIPTION = a79ce721-b590-4c49-8b65-35face434b79
+
+## Infrastruktur Deployment in GitHub Actions 
+
+Ggebenenfalls vor dem Deployment checken, was die neuster Version des GPT-4 Modells ist, und im main.bicep anpassen.
+
+```
+az cognitiveservices account list-models \
+  --name ai-service-test4-azure-ai-chat \
+  --resource-group test4-azure-ai-chat \
+  --query "[].{Model:name, Version:version}" \
+  --output table
+``` 
+
+GitHub Action 'Deploy Azure Infrastructure' starten
+
+## App Deployment in GitHub Actions
+
+in app-deploy.yml die App-Name anpassen
+in main.py azure_endpoint anpassen
+
+GitHub Action 'Deploy Azure App' starten
+
+# Prüfen Sie den Status des Private Endpoints
+   ```
+   az network private-endpoint show --name ai-service-test4-azure-ai-chat-pe --resource-group test4-azure-ai-chat
+   ```
+   
+# Prüfen Sie die DNS-Einträge
+   ```
+   az network private-dns record-set a list --zone-name privatelink.openai.azure.com --resource-group test4-azure-ai-chat
+   ```
+

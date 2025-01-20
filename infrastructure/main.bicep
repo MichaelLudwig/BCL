@@ -2,16 +2,16 @@
 param location string = resourceGroup().location
 
 @description('Der Name des App Service Plans')
-param appServicePlanName string = 'asp-bcl-reviewer'
+param appServicePlanName string = 'asp-${resourceGroup().name}'
 
 @description('Der Name der Web App')
-param webAppName string = 'app-bcl-reviewer'
+param webAppName string = 'app-${resourceGroup().name}'
 
 @description('Der Name des Azure OpenAI Services')
-param aiServiceName string = 'ai-service-bcl-reviewer'
+param aiServiceName string = 'ai-service-${resourceGroup().name}'
 
 @description('Der Name des VNets')
-param vnetName string = 'vnet-bcl-reviewer'
+param vnetName string = 'vnet-${resourceGroup().name}'
 
 @description('Das Subnetz für den Private Endpoint')
 param privateEndpointSubnetName string = 'subnet-private-endpoint'
@@ -103,13 +103,18 @@ resource aiService 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   properties: {
     customSubDomainName: aiServiceName
     publicNetworkAccess: 'Disabled' // Verhindert öffentlichen Zugriff
+    networkAcls: {
+      defaultAction: 'Allow'
+      virtualNetworkRules: []
+      ipRules: []
+    }
   }
 }
 
 // GPT-4 Modell Deployment
 resource gpt4Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
   parent: aiService
-  name: 'gpt-4-mini'
+  name: 'gpt-4o-mini'
   sku: {
     name: 'Standard'
     capacity: 1
@@ -120,6 +125,7 @@ resource gpt4Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
       name: 'gpt-4o-mini'
       version: '2024-07-18'
     }
+    raiPolicyName: 'Microsoft.Default'
   }
 }
 
@@ -147,7 +153,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' = {
 
 // Private DNS Zone erstellen
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.cognitiveservices.azure.com'
+  name: 'privatelink.openai.azure.com'
   location: 'global'
   properties: {}
 }
