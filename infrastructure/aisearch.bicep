@@ -156,6 +156,10 @@ resource searchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7ca78c08-252a-4471-8644-bb5ff32d4ba0')
     principalType: 'ServicePrincipal'
   }
+  // Ignoriere Fehler wenn Rolle bereits existiert
+  dependsOn: [
+    searchService
+  ]
 }
 
 // RBAC-Zuweisung für Web App zum Storage Account
