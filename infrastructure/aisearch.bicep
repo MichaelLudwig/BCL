@@ -11,7 +11,7 @@ param privateEndpointSubnetName string = 'subnet-private-endpoint'
 param searchServiceName string = 'search-${resourceGroup().name}'
 
 @description('Der Name des Storage Accounts für Dokumente alles klein und ohne Sonderzeichen')
-param storageAccountName string = 'docsa${substring(toLower(replace(resourceGroup().name, '-', '')), 0, 10)}'
+param storageAccountName string = 'store${uniqueString(resourceGroup().id)}'
 
 @description('Die Principal ID der Web App (Managed Identity), die Zugriff auf den Search Service erhalten soll')
 param webAppPrincipalId string
@@ -28,11 +28,11 @@ var privateEndpointSubnetId = '${existingVnet.id}/subnets/${privateEndpointSubne
 // -----------------------------------
 // 1) Storage Account
 // -----------------------------------
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
   location: location
   sku: {
-    name: 'Standard_RAGRS'
+    name: 'Standard_LRS'
   }
   kind: 'StorageV2'
   properties: {
@@ -48,6 +48,14 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
 }
 
+// Container für Dokumente
+resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
+  name: '${storageAccount.name}/default/documents'
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
 // -----------------------------------
 // 2) Azure Cognitive Search Service
 // -----------------------------------
@@ -58,11 +66,11 @@ resource searchService 'Microsoft.Search/searchServices@2023-10-01' = {
     name: 'standard'
   }
   properties: {
-    publicNetworkAccess: 'Disabled' // Nur privat erreichbar
+    publicNetworkAccess: 'Disabled'
+    semanticSearch: 'free'
     hostingMode: 'default'
     replicaCount: 1
     partitionCount: 1
-    semanticSearch: 'standard'
     vectorSearch: {
       mode: 'enabled'
     }
@@ -137,7 +145,22 @@ resource searchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
   scope: searchService
   properties: {
     principalId: webAppPrincipalId
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '275602e7-8741-4c13-9a44-2428efcf1f0e') // "Search Index Contributor"
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '275602e7-8741-4c13-9a44-2428efcf1f0e')
     principalType: 'ServicePrincipal'
   }
 }
+
+// RBAC-Zuweisung für Web App zum Storage Account
+resource storageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(storageAccount.id, webAppPrincipalId, 'Storage Blob Data Contributor')
+  scope: storageAccount
+  properties: {
+    principalId: webAppPrincipalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Outputs
+output searchServiceEndpoint string = 'https://${searchService.name}.search.windows.net'
+output storageAccountName string = storageAccount.name
