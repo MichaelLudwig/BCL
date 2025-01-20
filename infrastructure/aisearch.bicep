@@ -149,11 +149,11 @@ resource searchDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
 // 4) RBAC für Web App -> Search Service
 // -----------------------------------
 resource searchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(existingWebApp.id, searchService.id, 'Search Index Contributor')
+  name: guid(existingWebApp.id, searchService.id, 'Search Service Contributor')
   scope: searchService
   properties: {
     principalId: existingWebApp.identity.principalId
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '275602e7-8741-4c13-9a44-2428efcf1f0e')
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7ca78c08-252a-4471-8644-bb5ff32d4ba0')
     principalType: 'ServicePrincipal'
   }
 }
