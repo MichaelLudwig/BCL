@@ -8,7 +8,7 @@ param vnetName string = 'vnet-${resourceGroup().name}'
 param privateEndpointSubnetName string = 'subnet-private-endpoint'
 
 @description('Der Name des Azure Cognitive Search Services')
-param searchServiceName string = 'search-${resourceGroup().name}'
+param searchServiceName string = 'search${replace(toLower(resourceGroup().name), '-', '')}'
 
 @description('Der Name des Storage Accounts für Dokumente alles klein und ohne Sonderzeichen')
 param storageAccountName string = 'store${uniqueString(resourceGroup().id)}'
@@ -53,9 +53,16 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
 }
 
+// Blob Services
+resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01' = {
+  parent: storageAccount
+  name: 'default'
+}
+
 // Container für Dokumente
 resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
-  name: '${storageAccount.name}/default/documents'
+  parent: blobServices
+  name: 'documents'
   properties: {
     publicAccess: 'None'
   }
@@ -71,14 +78,11 @@ resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
     name: 'standard'
   }
   properties: {
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'disabled'
     semanticSearch: 'free'
     hostingMode: 'default'
     replicaCount: 1
     partitionCount: 1
-    vectorSearch: {
-      mode: 'enabled'
-    }
   }
 }
 
