@@ -200,3 +200,7 @@ resource openAIRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
     principalType: 'ServicePrincipal'
   }
 }
+
+// Outputs
+output webAppManagedIdentityPrincipalId string = webApp.identity.principalId
+

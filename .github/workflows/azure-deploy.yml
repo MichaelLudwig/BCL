@@ -15,7 +15,8 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       
-      - name: Deploy Bicep file
+      # 1) Deploy main.bicep
+      - name: Deploy basic infrastructure with main.bicep file
         id: deploy
         uses: azure/arm-deploy@v1
         with:
@@ -25,8 +26,20 @@ jobs:
           template: ./infrastructure/main.bicep
           failOnStdErr: false
 
+      # 2) Deploy aisearch.bicep
+      - name: Deploy aisearch.bicep
+        id: searchDeploy
+        uses: azure/arm-deploy@v1
+        with:
+          scope: resourcegroup
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+          resourceGroupName: ${{ secrets.AZURE_RG }}
+          template: ./infrastructure/aisearch.bicep
+          parameters: |
+            webAppPrincipalId=${{ steps.deploy.outputs.webAppManagedIdentityPrincipalId }}        
+
 
       # Beispiel für Verwendung des Outputs im nächsten Step
-      - name: Show Principal ID
-        run: |
-          echo "Die App ServicePrincipal ID ist: ${{ steps.deploy.outputs.managedIdentityPrincipalId }}" 
+      #- name: Show Principal ID
+      #  run: |
+      #    echo "Die App ServicePrincipal ID ist: ${{ steps.deploy.outputs.webAppManagedIdentityPrincipalId }}"
