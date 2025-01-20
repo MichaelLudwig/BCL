@@ -79,7 +79,6 @@ resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
   }
   properties: {
     publicNetworkAccess: 'disabled'
-    semanticSearch: 'free'
     hostingMode: 'default'
     replicaCount: 1
     partitionCount: 1
