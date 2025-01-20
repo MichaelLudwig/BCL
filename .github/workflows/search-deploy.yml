@@ -14,14 +14,14 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
-      # Deploy main.bicep
-      - name: Deploy basic infrastructure with main.bicep file
-        id: deploy
+
+      # Deploy aisearch.bicep
+      - name: Deploy aisearch.bicep
+        id: searchDeploy
         uses: azure/arm-deploy@v1
         with:
           scope: resourcegroup
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           resourceGroupName: ${{ secrets.AZURE_RG }}
-          template: ./infrastructure/main.bicep
-          failOnStdErr: false
+          template: ./infrastructure/aisearch.bicep
+               

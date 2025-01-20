@@ -13,8 +13,13 @@ param searchServiceName string = 'search-${resourceGroup().name}'
 @description('Der Name des Storage Accounts für Dokumente alles klein und ohne Sonderzeichen')
 param storageAccountName string = 'store${uniqueString(resourceGroup().id)}'
 
-@description('Die Principal ID der Web App (Managed Identity), die Zugriff auf den Search Service erhalten soll')
-param webAppPrincipalId string
+@description('Der Name der existierenden Web App')
+param webAppName string = 'app-${resourceGroup().name}'
+
+// Referenz auf die existierende Web App
+resource existingWebApp 'Microsoft.Web/sites@2021-02-01' existing = {
+  name: webAppName
+}
 
 // -----------------------------------
 // EXISTING VNet einbinden
@@ -141,10 +146,10 @@ resource searchDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
 // 4) RBAC für Web App -> Search Service
 // -----------------------------------
 resource searchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(webAppPrincipalId, searchService.id, 'Search Index Contributor')
+  name: guid(existingWebApp.id, searchService.id, 'Search Index Contributor')
   scope: searchService
   properties: {
-    principalId: webAppPrincipalId
+    principalId: existingWebApp.identity.principalId
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '275602e7-8741-4c13-9a44-2428efcf1f0e')
     principalType: 'ServicePrincipal'
   }
@@ -152,10 +157,10 @@ resource searchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
 
 // RBAC-Zuweisung für Web App zum Storage Account
 resource storageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, webAppPrincipalId, 'Storage Blob Data Contributor')
+  name: guid(storageAccount.id, existingWebApp.id, 'Storage Blob Data Contributor')
   scope: storageAccount
   properties: {
-    principalId: webAppPrincipalId
+    principalId: existingWebApp.identity.principalId
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
     principalType: 'ServicePrincipal'
   }
