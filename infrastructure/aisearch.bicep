@@ -59,7 +59,7 @@ resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/container
 // -----------------------------------
 // 2) Azure Cognitive Search Service
 // -----------------------------------
-resource searchService 'Microsoft.Search/searchServices@2023-10-01' = {
+resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
   name: searchServiceName
   location: location
   sku: {
