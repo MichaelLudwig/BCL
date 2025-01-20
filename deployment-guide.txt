@@ -7,7 +7,7 @@ az group create --name BCL-app --location swedencentral
 ## Service Prinicipal für Infrastruktur Deployment erstellen
 
 ```
-az ad sp create-for-rbac --name "bicep-deployer4" --role "Contributor" --scopes /subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/BCL-app --sdk-auth
+az ad sp create-for-rbac --name "bicep-deployer-bcl" --role "Contributor" --scopes /subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/BCL-app --sdk-auth
 ```
 
 Ergebnis in GitHub Secrets als AZURE_CREDENTIALS hinterlegen
@@ -15,13 +15,13 @@ Ergebnis in GitHub Secrets als AZURE_CREDENTIALS hinterlegen
 Dem Prinzipal das zusätzliche Recht geben, dem App Service Zugriffsrechte auf den Azure OpenAI Service zu gewähren
 
 ```
-az role assignment create --assignee 0def0389-e79a-4d21-96fa-22079a8c4256 --role "User Access Administrator" --scope /subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/BCL-app
+az role assignment create --assignee 8fb09fa4-2cc8-44e4-afef-4b05b3a77ed1 --role "User Access Administrator" --scope /subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/BCL-app
 ``` 
 
 ## Service Prinicipal für App Deployment erstellen
 
 ```
-az ad sp create-for-rbac --name "app-deployer4" --role "Website Contributor" --scopes /subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/BCL-app --sdk-auth
+az ad sp create-for-rbac --name "app-deployer-bcl" --role "Website Contributor" --scopes /subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/BCL-app --sdk-auth
 ```
 
 Ergebnis in GitHub Secrets als AZURE_APP_CREDENTIALS hinterlegen
