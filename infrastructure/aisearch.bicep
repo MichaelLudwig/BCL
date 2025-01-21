@@ -85,22 +85,19 @@ resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
     hostingMode: 'default'
     replicaCount: 1
     partitionCount: 1
-    encryptionWithCmk: {
-      // Konfiguration für Private Endpoints
-      privateEndpointConnections: [
-        {
-          properties: {
-            groupIds: [
-              'account'
-            ]
-            privateLinkServiceConnectionState: {
-              status: 'Approved'
-              description: 'Auto-Approved'
-            }
+    privateEndpointConnections: [
+      {
+        properties: {
+          groupIds: [
+            'account'
+          ]
+          privateLinkServiceConnectionState: {
+            status: 'Approved'
+            description: 'Auto-Approved'
           }
         }
-      ]
-    }
+      }
+    ]
   }
 }
 
