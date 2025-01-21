@@ -196,7 +196,7 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
   properties: {
     privateDnsZoneConfigs: [
       {
-        name: 'config'
+        name: 'openai-dns-config'
         properties: {
           privateDnsZoneId: privateDnsZone.id
         }
