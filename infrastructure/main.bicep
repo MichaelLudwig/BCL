@@ -192,11 +192,11 @@ resource dnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020
 // DNS Zone Group mit beiden Zonen
 resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-02-01' = {
   parent: privateEndpoint
-  name: 'default'
+  name: 'openai-dns-group'
   properties: {
     privateDnsZoneConfigs: [
       {
-        name: 'openai-dns-config'
+        name: 'openai-zone-config'
         properties: {
           privateDnsZoneId: privateDnsZone.id
         }
