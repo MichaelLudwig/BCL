@@ -188,6 +188,17 @@ resource searchToAiServiceRoleAssignment 'Microsoft.Authorization/roleAssignment
   }
 }
 
+// RBAC für Search Service -> Storage Account
+resource searchToStorageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(searchService.id, storageAccount.id, 'Storage Blob Data Reader')
+  scope: storageAccount
+  properties: {
+    principalId: searchService.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1') // Storage Blob Data Reader
+    principalType: 'ServicePrincipal'
+  }
+}
+
 // Outputs
 output searchServiceEndpoint string = 'https://${searchService.name}.search.windows.net'
 output storageAccountName string = storageAccount.name
