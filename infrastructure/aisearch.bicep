@@ -202,6 +202,64 @@ resource searchToStorageRoleAssignment 'Microsoft.Authorization/roleAssignments@
   }
 }
 
+// Private Endpoint für Storage Account
+resource storagePrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' = {
+  name: '${storageAccountName}-pe'
+  location: location
+  properties: {
+    subnet: {
+      id: privateEndpointSubnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: '${storageAccountName}-connection'
+        properties: {
+          privateLinkServiceId: storageAccount.id
+          groupIds: [
+            'blob'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+// Private DNS Zone für Blob Storage
+resource storageDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'privatelink.blob.core.windows.net'
+  location: 'global'
+  properties: {}
+}
+
+// DNS-Zonenlink für Storage
+resource storageDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: storageDnsZone
+  name: '${vnetName}-storage-dns-link'
+  location: 'global'
+  properties: {
+    virtualNetwork: {
+      id: existingVnet.id
+    }
+    registrationEnabled: false
+  }
+}
+
+// DNS Zone Group für Storage
+resource storageDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-02-01' = {
+  parent: storagePrivateEndpoint
+  name: 'default'
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'storageconfig'
+        properties: {
+          privateDnsZoneId: storageDnsZone.id
+        }
+      }
+    ]
+  }
+}
+
 // Outputs
 output searchServiceEndpoint string = 'https://${searchService.name}.search.windows.net'
 output storageAccountName string = storageAccount.name
