@@ -145,7 +145,14 @@ resource searchDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
 // -----------------------------------
 // 4) RBAC für Web App -> Search Service
 // -----------------------------------
-resource searchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+// Prüfe ob Rollenzuweisung bereits existiert
+resource existingRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' existing = {
+  name: guid(existingWebApp.id, searchService.id, 'Search Service Contributor')
+  scope: searchService
+}
+
+// Erstelle Rollenzuweisung nur wenn sie nicht existiert
+resource searchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!exists(existingRoleAssignment)) {
   name: guid(existingWebApp.id, searchService.id, 'Search Service Contributor')
   scope: searchService
   properties: {
@@ -155,8 +162,14 @@ resource searchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
   }
 }
 
+// Prüfe ob Storage Rollenzuweisung bereits existiert
+resource existingStorageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' existing = {
+  name: guid(storageAccount.id, existingWebApp.id, 'Storage Blob Data Contributor')
+  scope: storageAccount
+}
+
 // RBAC-Zuweisung für Web App zum Storage Account
-resource storageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource storageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!exists(existingStorageRoleAssignment)) {
   name: guid(storageAccount.id, existingWebApp.id, 'Storage Blob Data Contributor')
   scope: storageAccount
   properties: {
