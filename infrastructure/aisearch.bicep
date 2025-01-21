@@ -85,19 +85,6 @@ resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
     hostingMode: 'default'
     replicaCount: 1
     partitionCount: 1
-    privateEndpointConnections: [
-      {
-        properties: {
-          groupIds: [
-            'account'
-          ]
-          privateLinkServiceConnectionState: {
-            status: 'Approved'
-            description: 'Auto-Approved'
-          }
-        }
-      }
-    ]
   }
 }
 
