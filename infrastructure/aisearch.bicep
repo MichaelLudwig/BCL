@@ -74,6 +74,9 @@ resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/container
 resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
   name: searchServiceName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   sku: {
     name: 'basic'
   }
@@ -165,6 +168,22 @@ resource storageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-
   properties: {
     principalId: existingWebApp.identity.principalId
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Referenz auf den existierenden AI Service
+resource existingAiService 'Microsoft.CognitiveServices/accounts@2024-10-01' existing = {
+  name: 'ai-service-${resourceGroup().name}'
+}
+
+// RBAC für Search Service -> AI Service
+resource searchToAiServiceRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(searchService.id, existingAiService.id, 'Cognitive Services User')
+  scope: existingAiService
+  properties: {
+    principalId: searchService.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services User
     principalType: 'ServicePrincipal'
   }
 }
