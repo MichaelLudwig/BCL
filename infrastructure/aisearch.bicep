@@ -85,6 +85,22 @@ resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
     hostingMode: 'default'
     replicaCount: 1
     partitionCount: 1
+    encryptionWithCmk: {
+      // Konfiguration für Private Endpoints
+      privateEndpointConnections: [
+        {
+          properties: {
+            groupIds: [
+              'account'
+            ]
+            privateLinkServiceConnectionState: {
+              status: 'Approved'
+              description: 'Auto-Approved'
+            }
+          }
+        }
+      ]
+    }
   }
 }
 
@@ -112,12 +128,14 @@ resource searchPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' =
   }
 }
 
+// Private DNS Zone für Search Service
 resource searchDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: 'privatelink.search.windows.net'
   location: 'global'
   properties: {}
 }
 
+// DNS-Zonenlink mit VNet verbinden
 resource searchDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: searchDnsZone
   name: '${vnetName}-search-dns-link'
@@ -130,6 +148,7 @@ resource searchDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLink
   }
 }
 
+// DNS Zone Group für Search Service
 resource searchDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-02-01' = {
   parent: searchPrivateEndpoint
   name: 'default'

@@ -64,3 +64,4 @@ GitHub Action 'Deploy Azure App' starten
    az network private-dns record-set a list --zone-name privatelink.openai.azure.com --resource-group BCL-app
    ```
 
+az cognitiveservices account purge --name ai-service-BCL-app --location swedencentral --resource-group BCL-app
