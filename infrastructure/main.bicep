@@ -129,6 +129,24 @@ resource gpt4Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
   }
 }
 
+// Ada-002 Embeddings Modell Deployment
+resource embeddingsDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+  parent: aiService
+  name: 'text-embedding-ada-002'
+  sku: {
+    name: 'Standard'
+    capacity: 1
+  }
+  properties: {
+    model: {
+      format: 'OpenAI'
+      name: 'text-embedding-ada-002'
+      version: '2'
+    }
+    raiPolicyName: 'Microsoft.Default'
+  }
+}
+
 // Private Endpoint für Azure OpenAI Service erstellen
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' = {
   name: '${aiServiceName}-pe'
