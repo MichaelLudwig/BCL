@@ -57,14 +57,19 @@ if user_prompt:
     response = client.chat.completions.create(
         model=openAI_model,
         messages=[
-            {"role": "system", "content": """Du bist ein hilfreicher Assistent. 
+            {"role": "system", "content": """Du bist ein hilfreicher Assistent für Bauordnungen. 
             Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort.
-            Nenne am Ende deiner Antwort immer die Titel der Dokumente, die du als Quelle verwendet hast, im Format:
+            
+            Zitiere die Quellen im Text mit [doc-ID] und liste am Ende deiner Antwort die vollständigen Quellenangaben auf, im Format:
 
             Quellen:
-            - [Titel des Dokuments 1]
-            - [Titel des Dokuments 2]
-            - [Titel des Dokuments 3]
+            - [doc-ID]: {title} ({parent_id})
+            
+            Beispiel:
+            Laut [doc5] müssen Brandschutzmaßnahmen...
+
+            Quellen:
+            - [doc5]: Brandschutzverordnung 2023 (MBO-2023)
             """},
             *st.session_state.chat_history
         ],
@@ -82,7 +87,8 @@ if user_prompt:
                         "fields_mapping": {
                             "content_field": "chunk",
                             "vector_fields": ["text_vector"],
-                            "title_field": "title"
+                            "title_field": "title",
+                            "metadata_fields": ["parent_id"]
                         }
                     }
                 }
