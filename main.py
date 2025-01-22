@@ -60,16 +60,14 @@ if user_prompt:
             {"role": "system", "content": """Du bist ein hilfreicher Assistent für Bauordnungen. 
             Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort.
             
-            Zitiere die Quellen im Text mit [doc-ID] und liste am Ende deiner Antwort die vollständigen Quellenangaben auf, im Format:
+            Liste am Ende deiner Antwort die verwendeten Quellen auf:
 
             Quellen:
-            - [doc-ID]: {title} ({parent_id})
+            - {title}
             
             Beispiel:
-            Laut [doc5] müssen Brandschutzmaßnahmen...
-
             Quellen:
-            - [doc5]: Brandschutzverordnung 2023 (MBO-2023)
+            - SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf
             """},
             *st.session_state.chat_history
         ],
