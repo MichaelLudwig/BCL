@@ -4,8 +4,6 @@ from openai import OpenAI
 import os
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from dotenv import load_dotenv
-from azure.search.documents import SearchClient
-from azure.search.documents.models import VectorizedQuery
 
 st.set_page_config(layout="wide")
 
@@ -31,13 +29,6 @@ else:
         azure_endpoint="https://ai-service-BCL-app.openai.azure.com/"
     )
 openAI_model = "gpt-4o-mini"
-
-# Search Client Setup
-search_client = SearchClient(
-    endpoint=f"https://searchbclapp.search.windows.net",
-    index_name="bcl-data",
-    credential=DefaultAzureCredential()
-)
 
 # Chat Interface -------------------------------------------------------------
 
@@ -70,19 +61,24 @@ if user_prompt:
             *st.session_state.chat_history
         ],
         extra_body={
-            "dataSources": [{
-                "type": "AzureCognitiveSearch",
-                "parameters": {
-                    "endpoint": "https://searchbclapp.search.windows.net",
-                    "indexName": "bcl-data",
-                    "queryType": "vector",
-                    "fieldsMapping": {
-                        "contentField": "chunk",
-                        "vectorFields": ["text_vector"],
-                        "titleField": "title"
+            "data_sources": [
+                {
+                    "type": "azure_search",
+                    "parameters": {
+                        "endpoint": "https://searchbclapp.search.windows.net",
+                        "index_name": "bcl-data",
+                        "authentication": {
+                            "type": "system_assigned_managed_identity"
+                        },
+                        "top_k": 3,
+                        "fields_mapping": {
+                            "content_field": "chunk",
+                            "vector_fields": ["text_vector"],
+                            "title_field": "title"
+                        }
                     }
                 }
-            }]
+            ]
         }
     )
 
