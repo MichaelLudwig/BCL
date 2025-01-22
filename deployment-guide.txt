@@ -67,3 +67,5 @@ GitHub Action 'Deploy Azure App' starten
 az cognitiveservices account purge --name ai-service-BCL-app --location swedencentral --resource-group BCL-app
 
 Was steht in der Sächsichen Bauorndung zu Gebäuden mit Nutzungseinheiten zum Zwecke der Pflege oder Betreuung von Personen?
+
+az search service show --name searchbclapp --resource-group BCL-app

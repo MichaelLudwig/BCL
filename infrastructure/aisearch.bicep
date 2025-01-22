@@ -88,6 +88,9 @@ resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
     hostingMode: 'default'
     replicaCount: 1
     partitionCount: 1
+    authOptions: {
+      aadOrApiKey: {}  // Aktiviert RBAC-basierte Authentifizierung
+    }
   }
 }
 
