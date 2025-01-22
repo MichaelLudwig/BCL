@@ -97,12 +97,15 @@ resource aiService 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   name: aiServiceName
   location: location
   kind: 'OpenAI'
+  identity: {
+    type: 'SystemAssigned'
+  }
   sku: {
     name: 'S0'
   }
   properties: {
     customSubDomainName: aiServiceName
-    publicNetworkAccess: 'Disabled' // Verhindert öffentlichen Zugriff
+    publicNetworkAccess: 'Disabled'
     networkAcls: {
       defaultAction: 'Allow'
       virtualNetworkRules: []

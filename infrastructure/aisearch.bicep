@@ -263,6 +263,17 @@ resource storageDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
   }
 }
 
+// RBAC für OpenAI Service -> Search Service
+resource openaiToSearchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(existingAiService.id, searchService.id, 'Search Service Contributor')
+  scope: searchService
+  properties: {
+    principalId: existingAiService.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7ca78c08-252a-4471-8644-bb5ff32d4ba0') // Search Service Contributor
+    principalType: 'ServicePrincipal'
+  }
+}
+
 // Outputs
 output searchServiceEndpoint string = 'https://${searchService.name}.search.windows.net'
 output storageAccountName string = storageAccount.name
