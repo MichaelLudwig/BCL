@@ -189,7 +189,7 @@ resource searchToAiServiceRoleAssignment 'Microsoft.Authorization/roleAssignment
   scope: existingAiService
   properties: {
     principalId: searchService.identity.principalId
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5b5bc275-ed7f-4bab-8c17-e2e103c9b12e') // Cognitive Services OpenAI User
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a001fd3d-188f-4b5d-821b-7da978bf7442') // Cognitive Services OpenAI User
     principalType: 'ServicePrincipal'
   }
 }
