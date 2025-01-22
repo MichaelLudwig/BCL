@@ -69,18 +69,20 @@ if user_prompt:
             {"role": "system", "content": "Du bist ein hilfreicher Assistent. Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort."},
             *st.session_state.chat_history
         ],
-        dataSources=[{  # Vector Search über Parameter - neu hinzugefügt -----------------------------------------------------------------------
-            "type": "AzureCognitiveSearch",
-            "parameters": {
-                "endpoint": "https://searchbclapp.search.windows.net",
-                "indexName": "bcl-data",
-                "queryType": "vector",
-                "fieldsMapping": {
-                    "contentField": "content",
-                    "vectorFields": ["contentVector"]
+        extra_body={
+            "dataSources": [{
+                "type": "AzureCognitiveSearch",
+                "parameters": {
+                    "endpoint": "https://searchbclapp.search.windows.net",
+                    "indexName": "bcl-data",
+                    "queryType": "vector",
+                    "fieldsMapping": {
+                        "contentField": "content",
+                        "vectorFields": ["contentVector"]
+                    }
                 }
-            }
-        }]
+            }]
+        }
     )
 
     assistant_response = response.choices[0].message.content
