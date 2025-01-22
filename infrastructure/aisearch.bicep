@@ -185,11 +185,11 @@ resource existingAiService 'Microsoft.CognitiveServices/accounts@2024-10-01' exi
 
 // RBAC für Search Service -> AI Service
 resource searchToAiServiceRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(searchService.id, existingAiService.id, 'Cognitive Services User')
+  name: guid(searchService.id, existingAiService.id, 'Cognitive Services OpenAI User')
   scope: existingAiService
   properties: {
     principalId: searchService.identity.principalId
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd') // Cognitive Services User
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5b5bc275-ed7f-4bab-8c17-e2e103c9b12e') // Cognitive Services OpenAI User
     principalType: 'ServicePrincipal'
   }
 }
