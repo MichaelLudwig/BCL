@@ -88,10 +88,6 @@ resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
     hostingMode: 'default'
     replicaCount: 1
     partitionCount: 1
-    networkRuleSet: {
-      bypass: 'AzureServices'
-      defaultAction: 'Deny'
-    }
   }
 }
 
