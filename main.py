@@ -4,6 +4,8 @@ from openai import OpenAI
 import os
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from dotenv import load_dotenv
+from azure.search.documents import SearchClient
+from azure.search.documents.models import VectorizedQuery
 
 st.set_page_config(layout="wide")
 
@@ -29,6 +31,13 @@ else:
         azure_endpoint="https://ai-service-BCL-app.openai.azure.com/"
     )
 openAI_model = "gpt-4o-mini"
+
+# Search Client Setup
+search_client = SearchClient(
+    endpoint=f"https://searchbclapp.search.windows.net",
+    index_name="bcl-data",
+    credential=DefaultAzureCredential()
+)
 
 # Chat Interface -------------------------------------------------------------
 
@@ -57,10 +66,21 @@ if user_prompt:
     response = client.chat.completions.create(
         model=openAI_model,
         messages=[
-            {"role": "system", "content": "Du bist ein hilfreicher Assistent"},
+            {"role": "system", "content": "Du bist ein hilfreicher Assistent. Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort."},
             *st.session_state.chat_history
-        ]
-        
+        ],
+        dataSources=[{  # Vector Search über Parameter - neu hinzugefügt -----------------------------------------------------------------------
+            "type": "AzureCognitiveSearch",
+            "parameters": {
+                "endpoint": "https://searchbclapp.search.windows.net",
+                "indexName": "bcl-data",
+                "queryType": "vector",
+                "fieldsMapping": {
+                    "contentField": "content",
+                    "vectorFields": ["contentVector"]
+                }
+            }
+        }]
     )
 
     assistant_response = response.choices[0].message.content
