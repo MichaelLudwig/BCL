@@ -57,7 +57,15 @@ if user_prompt:
     response = client.chat.completions.create(
         model=openAI_model,
         messages=[
-            {"role": "system", "content": "Du bist ein hilfreicher Assistent. Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort."},
+            {"role": "system", "content": """Du bist ein hilfreicher Assistent. 
+            Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort.
+            Nenne am Ende deiner Antwort immer die Titel der Dokumente, die du als Quelle verwendet hast, im Format:
+
+            Quellen:
+            - [Titel des Dokuments 1]
+            - [Titel des Dokuments 2]
+            - [Titel des Dokuments 3]
+            """},
             *st.session_state.chat_history
         ],
         extra_body={
