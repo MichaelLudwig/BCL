@@ -77,8 +77,9 @@ if user_prompt:
                     "indexName": "bcl-data",
                     "queryType": "vector",
                     "fieldsMapping": {
-                        "contentField": "content",
-                        "vectorFields": ["contentVector"]
+                        "contentField": "chunk",
+                        "vectorFields": ["text_vector"],
+                        "titleField": "title"
                     }
                 }
             }]
