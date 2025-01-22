@@ -88,6 +88,10 @@ resource searchService 'Microsoft.Search/searchServices@2023-11-01' = {
     hostingMode: 'default'
     replicaCount: 1
     partitionCount: 1
+    networkRuleSet: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
+    }
   }
 }
 
@@ -265,11 +269,11 @@ resource storageDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
 
 // RBAC für OpenAI Service -> Search Service
 resource openaiToSearchRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(existingAiService.id, searchService.id, 'Search Service Contributor')
+  name: guid(existingAiService.id, searchService.id, 'Search Index Data Reader')
   scope: searchService
   properties: {
     principalId: existingAiService.identity.principalId
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7ca78c08-252a-4471-8644-bb5ff32d4ba0') // Search Service Contributor
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f') // Search Index Data Reader
     principalType: 'ServicePrincipal'
   }
 }

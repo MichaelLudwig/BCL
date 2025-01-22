@@ -120,7 +120,7 @@ resource gpt4Deployment 'Microsoft.CognitiveServices/accounts/deployments@2024-1
   name: 'gpt-4o-mini'
   sku: {
     name: 'Standard'
-    capacity: 1
+    capacity: 50
   }
   properties: {
     model: {
@@ -138,7 +138,7 @@ resource embeddingsDeployment 'Microsoft.CognitiveServices/accounts/deployments@
   name: 'text-embedding-ada-002'
   sku: {
     name: 'Standard'
-    capacity: 1
+    capacity: 50
   }
   properties: {
     model: {
