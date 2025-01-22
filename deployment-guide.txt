@@ -65,3 +65,12 @@ GitHub Action 'Deploy Azure App' starten
    ```
 
 az cognitiveservices account purge --name ai-service-BCL-app --location swedencentral --resource-group BCL-app
+
+az network private-link-resource list --name searchbclapp --resource-group BCL-app --type Microsoft.Search/searchServices
+
+curl -X POST "https://ai-service-bcl-app.openai.azure.com/openai/deployments/text-embedding-ada-002/embeddings?api-version=2023-05-15" \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $(az account get-access-token --resource https://cognitiveservices.azure.com --query accessToken -o tsv)" \
+-d '{"input": "test"}'
+
+az account get-access-token --resource https://cognitiveservices.azure.com --query accessToken -o tsv

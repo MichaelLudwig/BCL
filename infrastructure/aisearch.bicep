@@ -16,6 +16,9 @@ param storageAccountName string = 'store${uniqueString(resourceGroup().id)}'
 @description('Der Name der existierenden Web App')
 param webAppName string = 'app-${resourceGroup().name}'
 
+@description('Die Private DNS Zone URL für Blob Storage')
+param blobDnsZoneUrl string = 'privatelink.blob.${environment().suffixes.storage}'
+
 // Referenz auf die existierende Web App
 resource existingWebApp 'Microsoft.Web/sites@2021-02-01' existing = {
   name: webAppName
@@ -226,7 +229,7 @@ resource storagePrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' 
 
 // Private DNS Zone für Blob Storage
 resource storageDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'privatelink.blob.core.windows.net'
+  name: blobDnsZoneUrl
   location: 'global'
   properties: {}
 }
