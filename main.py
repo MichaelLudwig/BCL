@@ -67,7 +67,7 @@ if user_prompt:
             
             Beispiel:
             Quellen:
-            - [ref1]: SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf (Bundesland: Sachsen, Kategorie: Bauordnung)
+            - [ref1]: SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf (Bundesland: Sachsen, Baukategorie: Bauordnung)
             """},
             *st.session_state.chat_history
         ],
