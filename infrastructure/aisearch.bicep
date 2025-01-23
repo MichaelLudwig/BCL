@@ -197,13 +197,24 @@ resource searchToAiServiceRoleAssignment 'Microsoft.Authorization/roleAssignment
   }
 }
 
-// RBAC für Search Service -> Storage Account
+// RBAC für AI Service -> Storage Account
+resource aiServiceToStorageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(existingAiService.id, storageAccount.id, 'Storage Blob Data Contributor')
+  scope: storageAccount
+  properties: {
+    principalId: existingAiService.identity.principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// RBAC für Search Service -> Storage Account (ändern von Reader zu Contributor)
 resource searchToStorageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(searchService.id, storageAccount.id, 'Storage Blob Data Reader')
+  name: guid(searchService.id, storageAccount.id, 'Storage Blob Data Contributor')
   scope: storageAccount
   properties: {
     principalId: searchService.identity.principalId
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1') // Storage Blob Data Reader
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
     principalType: 'ServicePrincipal'
   }
 }
