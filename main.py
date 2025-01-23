@@ -108,6 +108,9 @@ if user_prompt:
         st.markdown(assistant_response)
         st.text("Prompt Token: " + str(response.usage.prompt_tokens) + " Response Token: " + str(response.usage.completion_tokens))
 
-    
+    # Token usage ausgeben
+    st.write(f"""
+    Token Usage: Input Tokens: {response.usage.prompt_tokens} Output Tokens: {response.usage.completion_tokens} Total Tokens: {response.usage.total_tokens}
+    """)
 
         
