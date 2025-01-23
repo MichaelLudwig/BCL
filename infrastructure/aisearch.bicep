@@ -109,9 +109,7 @@ resource searchPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' =
         name: '${searchServiceName}-connection'
         properties: {
           privateLinkServiceId: searchService.id
-          groupIds: [
-            'searchService'
-          ]
+          groupIds: ['searchService']
         }
       }
     ]
@@ -149,6 +147,20 @@ resource searchDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
         properties: {
           privateDnsZoneId: searchDnsZone.id
         }
+      }
+    ]
+  }
+}
+
+// A-Record in der Private DNS Zone für den Search Service
+resource searchDnsZoneRecord 'Microsoft.Network/privateDnsZones/A@2020-06-01' = {
+  parent: searchDnsZone
+  name: searchServiceName
+  properties: {
+    ttl: 3600
+    aRecords: [
+      {
+        ipv4Address: searchPrivateEndpoint.properties.customDnsConfigs[0].ipAddresses[0]
       }
     ]
   }
@@ -299,14 +311,14 @@ output storageAccountName string = storageAccount.name
 
 // Route Table für den Search Service -> OpenAI Traffic
 resource searchServiceRoute 'Microsoft.Network/routeTables@2023-02-01' = {
-  name: '${searchServiceName}-routes'
+  name: '${searchServiceName}-route-table'
   location: location
   properties: {
     routes: [
       {
-        name: 'to-openai'
+        name: 'OpenAIPrivateEndpoint'
         properties: {
-          addressPrefix: 'privatelink.openai.azure.com'
+          addressPrefix: '10.0.0.0/16'
           nextHopType: 'VirtualAppliance'
           nextHopIpAddress: existingOpenAiPrivateEndpoint.properties.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress
         }
@@ -315,12 +327,12 @@ resource searchServiceRoute 'Microsoft.Network/routeTables@2023-02-01' = {
   }
 }
 
-// Existierendes Private Endpoint Subnet aktualisieren
+// Verknüpfung mit dem Private Endpoint Subnet
 resource privateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-02-01' = {
   parent: existingVnet
   name: privateEndpointSubnetName
   properties: {
-    addressPrefix: '10.0.1.0/24'  // Bestehendes Prefix beibehalten
+    addressPrefix: '10.0.1.0/24'
     privateEndpointNetworkPolicies: 'Disabled'
     routeTable: {
       id: searchServiceRoute.id
