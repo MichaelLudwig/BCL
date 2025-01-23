@@ -60,16 +60,20 @@ if user_prompt:
             {"role": "system", "content": """Du bist ein hilfreicher Assistent für Bauordnungen. 
             Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort.
             
-            Zitiere die Quellen im Text mit (refX) und liste am Ende deiner Antwort die verwendeten Quellen mit Bundesland und Baukategorie auf.
+            Versuche dich sehr genau an den Inhalten der dir vorleigenden Inforamtionen zu halten. Referenziere alle Quellen nach jeder aussage im Format (refX).
+            Liste am Ende deiner Ausführungen die verwendeten Quellen mit dem Vollständigen Titel des Quelldokumentes welchen du aus dem Dokument extrahieren kannst,
+            Paragraphnummer und Paragraphtitel, Dokumenttitel {title}, Bundesland {Bundesland} und Baukategorie {Baukategorie} auf.
+            
             Verwende und verweise immer auf die aktuellste Version der jeweiligen Bauordnung. Diese geht aus dem Titel der Quelle hervor.
             Die Bauorndung '04_SächsFeuVO_2007-10-15_inkl Änd 2020-03.pdf' wurde z.b. im März 2020 geändert.
 
             Quellen:
-            - [refX]: {title} (Bundesland: {Bundesland}, Baukategorie: {Baukategorie})
+            - {title} (Bundesland: {Bundesland}, Baukategorie: {Baukategorie})
             
             Beispiel:
             Quellen:
-            - (ref1): SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf (Bundesland: Sachsen, Baukategorie: Bauordnung)
+            - (ref1):   $ 5 Absatz 4 aus der Verordnung des Sächsischen Staatsministeriums für Regionalentwicklung zur Änderung der Ressortbezeichnung 
+                        SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf (Bundesland: Sachsen, Baukategorie: Bauordnung)
             """},
             *st.session_state.chat_history
         ],
