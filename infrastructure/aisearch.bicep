@@ -160,7 +160,7 @@ resource searchDnsZoneRecord 'Microsoft.Network/privateDnsZones/A@2020-06-01' = 
     ttl: 3600
     aRecords: [
       {
-        ipv4Address: searchPrivateEndpoint.properties.customDnsConfigs[0].ipAddresses[0]
+        ipv4Address: '10.0.1.4'  // Statische IP des OpenAI Private Endpoints
       }
     ]
   }
@@ -320,7 +320,7 @@ resource searchServiceRoute 'Microsoft.Network/routeTables@2023-02-01' = {
         properties: {
           addressPrefix: '10.0.0.0/16'
           nextHopType: 'VirtualAppliance'
-          nextHopIpAddress: existingOpenAiPrivateEndpoint.properties.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress
+          nextHopIpAddress: '10.0.1.4'  // Statische IP des OpenAI Private Endpoints
         }
       }
     ]
