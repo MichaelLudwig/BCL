@@ -60,14 +60,14 @@ if user_prompt:
             {"role": "system", "content": """Du bist ein hilfreicher Assistent für Bauordnungen. 
             Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort.
             
-            Liste am Ende deiner Antwort die verwendeten Quellen auf:
+            Zitiere die Quellen im Text mit [refX] und liste am Ende deiner Antwort die verwendeten Quellen mit Bundesland und Baukategorie auf:
 
             Quellen:
-            - {title}
+            - [refX]: {title} (Bundesland: {bundesland}, Kategorie: {baukategorie})
             
             Beispiel:
             Quellen:
-            - SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf
+            - [ref1]: SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf (Bundesland: Sachsen, Kategorie: Bauordnung)
             """},
             *st.session_state.chat_history
         ],
@@ -86,7 +86,7 @@ if user_prompt:
                             "content_field": "chunk",
                             "vector_fields": ["text_vector"],
                             "title_field": "title",
-                            "metadata_fields": ["parent_id"]
+                            "metadata_fields": ["bundesland", "baukategorie"]
                         }
                     }
                 }
