@@ -288,6 +288,28 @@ resource openaiToSearchRoleAssignment 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
+// Referenz auf den OpenAI Private Endpoint
+resource existingOpenAiPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-02-01' existing = {
+  name: '${existingAiService.name}-pe'
+}
+
 // Outputs
 output searchServiceEndpoint string = 'https://${searchService.name}.search.windows.net'
 output storageAccountName string = storageAccount.name
+
+resource searchServiceRoute 'Microsoft.Network/routeTables@2023-02-01' = {
+  name: '${searchServiceName}-routes'
+  location: location
+  properties: {
+    routes: [
+      {
+        name: 'to-openai'
+        properties: {
+          addressPrefix: 'privatelink.openai.azure.com'
+          nextHopType: 'VirtualAppliance'
+          nextHopIpAddress: existingOpenAiPrivateEndpoint.properties.customDnsConfigs[0].ipAddresses[0]
+        }
+      }
+    ]
+  }
+}
