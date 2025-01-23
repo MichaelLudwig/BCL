@@ -86,7 +86,7 @@ if user_prompt:
                             "content_field": "chunk",
                             "vector_fields": ["text_vector"],
                             "title_field": "title",
-                            "metadata_fields": ["bundesland", "baukategorie"]
+                            "metadata_fields": ["Bundesland", "Baukategorie"]
                         }
                     }
                 }
