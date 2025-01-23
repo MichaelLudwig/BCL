@@ -19,9 +19,6 @@ param webAppName string = 'app-${resourceGroup().name}'
 @description('Die Private DNS Zone URL für Blob Storage')
 param blobDnsZoneUrl string = 'privatelink.blob.${environment().suffixes.storage}'
 
-// Parameter für die OpenAI Private Endpoint IP
-param openAiPrivateEndpointIp string
-
 // Referenz auf die existierende Web App
 resource existingWebApp 'Microsoft.Web/sites@2021-02-01' existing = {
   name: webAppName
@@ -311,7 +308,7 @@ resource searchServiceRoute 'Microsoft.Network/routeTables@2023-02-01' = {
         properties: {
           addressPrefix: 'privatelink.openai.azure.com'
           nextHopType: 'VirtualAppliance'
-          nextHopIpAddress: openAiPrivateEndpointIp
+          nextHopIpAddress: existingOpenAiPrivateEndpoint.properties.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress
         }
       }
     ]
