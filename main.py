@@ -60,7 +60,9 @@ if user_prompt:
             {"role": "system", "content": """Du bist ein hilfreicher Assistent für Bauordnungen. 
             Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort.
             
-            Zitiere die Quellen im Text mit (refX) und liste am Ende deiner Antwort die verwendeten Quellen mit Bundesland und Baukategorie auf:
+            Zitiere die Quellen im Text mit (refX) und liste am Ende deiner Antwort die verwendeten Quellen mit Bundesland und Baukategorie auf.
+            Verwende und verweise immer auf die aktuellste Version der jeweiligen Bauordnung. Diese geht aus dem Titel der Quelle hervor.
+            Die Bauorndung '04_SächsFeuVO_2007-10-15_inkl Änd 2020-03.pdf' wurde z.b. im März 2020 geändert.
 
             Quellen:
             - [refX]: {title} (Bundesland: {Bundesland}, Baukategorie: {Baukategorie})
