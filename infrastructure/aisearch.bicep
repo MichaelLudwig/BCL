@@ -19,6 +19,9 @@ param webAppName string = 'app-${resourceGroup().name}'
 @description('Die Private DNS Zone URL für Blob Storage')
 param blobDnsZoneUrl string = 'privatelink.blob.${environment().suffixes.storage}'
 
+// Parameter für die OpenAI Private Endpoint IP
+param openAiPrivateEndpointIp string
+
 // Referenz auf die existierende Web App
 resource existingWebApp 'Microsoft.Web/sites@2021-02-01' existing = {
   name: webAppName
@@ -297,6 +300,7 @@ resource existingOpenAiPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-
 output searchServiceEndpoint string = 'https://${searchService.name}.search.windows.net'
 output storageAccountName string = storageAccount.name
 
+// Route Table für den Search Service -> OpenAI Traffic
 resource searchServiceRoute 'Microsoft.Network/routeTables@2023-02-01' = {
   name: '${searchServiceName}-routes'
   location: location
@@ -307,9 +311,22 @@ resource searchServiceRoute 'Microsoft.Network/routeTables@2023-02-01' = {
         properties: {
           addressPrefix: 'privatelink.openai.azure.com'
           nextHopType: 'VirtualAppliance'
-          nextHopIpAddress: existingOpenAiPrivateEndpoint.properties.customDnsConfigs[0].ipAddresses[0]
+          nextHopIpAddress: openAiPrivateEndpointIp
         }
       }
     ]
+  }
+}
+
+// Existierendes Private Endpoint Subnet aktualisieren
+resource privateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-02-01' = {
+  parent: existingVnet
+  name: privateEndpointSubnetName
+  properties: {
+    addressPrefix: '10.0.1.0/24'  // Bestehendes Prefix beibehalten
+    privateEndpointNetworkPolicies: 'Disabled'
+    routeTable: {
+      id: searchServiceRoute.id
+    }
   }
 }
