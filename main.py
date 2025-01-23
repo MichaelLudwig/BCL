@@ -63,7 +63,7 @@ if user_prompt:
             Zitiere die Quellen im Text mit [refX] und liste am Ende deiner Antwort die verwendeten Quellen mit Bundesland und Baukategorie auf:
 
             Quellen:
-            - [refX]: {title} (Bundesland: {bundesland}, Kategorie: {baukategorie})
+            - [refX]: {title} (Bundesland: {Bundesland}, Baukategorie: {Baukategorie})
             
             Beispiel:
             Quellen:
