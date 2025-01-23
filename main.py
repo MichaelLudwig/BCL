@@ -107,4 +107,9 @@ if user_prompt:
     with st.chat_message("assistant"):
         st.markdown(assistant_response)
 
+    # Token usage ausgeben
+    st.write(f"""
+    Token Usage: Input Tokens: {response.usage.prompt_tokens} Output Tokens: {response.usage.completion_tokens} Total Tokens: {response.usage.total_tokens}
+    """)
+
         
