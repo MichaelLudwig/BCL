@@ -4,4 +4,3 @@ openai
 azure-identity
 python-docx
 python-dotenv
-azure-search-documents

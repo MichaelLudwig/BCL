@@ -1,0 +1,19 @@
+{
+    "@odata.context": "https://searchbclapp.search.windows.net/$metadata#datasources/$entity",
+    "@odata.etag": "\"0x8DD3EAF2EDC9FAF\"",
+    "name": "bcl-data-datasource",
+    "description": "Datenquelle für Sächsische Bauordnung",
+    "type": "azureblob",
+    "subtype": null,
+    "credentials": {
+      "connectionString": "ResourceId=/subscriptions/a79ce721-b590-4c49-8b65-35face434b79/resourceGroups/BCL-app/providers/Microsoft.Storage/storageAccounts/storedlzdivyxevanm;"
+    },
+    "container": {
+      "name": "documents",
+      "query": "Regelwerke/Sachsen/Bauordnung"
+    },
+    "dataChangeDetectionPolicy": null,
+    "dataDeletionDetectionPolicy": null,
+    "encryptionKey": null,
+    "identity": null
+  }

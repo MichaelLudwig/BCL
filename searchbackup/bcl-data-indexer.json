@@ -1,0 +1,72 @@
+{
+    "@odata.context": "https://searchbclapp.search.windows.net/$metadata#indexers/$entity",
+    "@odata.etag": "\"0x8DD3EAF2FCE06EA\"",
+    "name": "bcl-data-indexer",
+    "description": null,
+    "dataSourceName": "bcl-data-datasource",
+    "skillsetName": "bcl-data-skillset",
+    "targetIndexName": "bcl-data",
+    "disabled": null,
+    "schedule": null,
+    "parameters": {
+      "batchSize": null,
+      "maxFailedItems": null,
+      "maxFailedItemsPerBatch": null,
+      "base64EncodeKeys": null,
+      "configuration": {
+        "dataToExtract": "contentAndMetadata",
+        "parsingMode": "default"
+      }
+    },
+    "fieldMappings": [
+      {
+        "sourceFieldName": "metadata_storage_name",
+        "targetFieldName": "title",
+        "mappingFunction": null
+      },
+      {
+        "sourceFieldName": "metadata_storage_path",
+        "targetFieldName": "folderPath",
+        "mappingFunction": null
+      },
+      {
+        "sourceFieldName": "metadata_storage_path",
+        "targetFieldName": "Dokumententyp",
+        "mappingFunction": {
+          "name": "extractTokenAtPosition",
+          "parameters": {
+            "delimiter": "/",
+            "position@odata.type": "#Int64",
+            "position": 1
+          }
+        }
+      },
+      {
+        "sourceFieldName": "metadata_storage_path",
+        "targetFieldName": "Bundesland",
+        "mappingFunction": {
+          "name": "extractTokenAtPosition",
+          "parameters": {
+            "delimiter": "/",
+            "position@odata.type": "#Int64",
+            "position": 2
+          }
+        }
+      },
+      {
+        "sourceFieldName": "metadata_storage_path",
+        "targetFieldName": "Baukategorie",
+        "mappingFunction": {
+          "name": "extractTokenAtPosition",
+          "parameters": {
+            "delimiter": "/",
+            "position@odata.type": "#Int64",
+            "position": 3
+          }
+        }
+      }
+    ],
+    "outputFieldMappings": [],
+    "cache": null,
+    "encryptionKey": null
+  }

@@ -1,0 +1,215 @@
+{
+    "@odata.etag": "\"0x8DD3C9C033EBC79\"",
+    "name": "bcl-data",
+    "fields": [
+      {
+        "name": "chunk_id",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": false,
+        "retrievable": true,
+        "stored": true,
+        "sortable": true,
+        "facetable": false,
+        "key": true,
+        "analyzer": "keyword",
+        "synonymMaps": []
+      },
+      {
+        "name": "parent_id",
+        "type": "Edm.String",
+        "searchable": false,
+        "filterable": true,
+        "retrievable": true,
+        "stored": true,
+        "sortable": false,
+        "facetable": false,
+        "key": false,
+        "synonymMaps": []
+      },
+      {
+        "name": "chunk",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": false,
+        "retrievable": true,
+        "stored": true,
+        "sortable": false,
+        "facetable": false,
+        "key": false,
+        "synonymMaps": []
+      },
+      {
+        "name": "title",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": false,
+        "retrievable": true,
+        "stored": true,
+        "sortable": false,
+        "facetable": false,
+        "key": false,
+        "synonymMaps": []
+      },
+      {
+        "name": "text_vector",
+        "type": "Collection(Edm.Single)",
+        "searchable": true,
+        "filterable": false,
+        "retrievable": true,
+        "stored": true,
+        "sortable": false,
+        "facetable": false,
+        "key": false,
+        "dimensions": 1536,
+        "vectorSearchProfile": "bcl-data-azureOpenAi-text-profile",
+        "synonymMaps": []
+      },
+      {
+        "name": "folderPath",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": true,
+        "retrievable": true,
+        "stored": true,
+        "sortable": true,
+        "facetable": true,
+        "key": false,
+        "synonymMaps": []
+      },
+      {
+        "name": "Dokumententyp",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": true,
+        "retrievable": true,
+        "stored": true,
+        "sortable": true,
+        "facetable": true,
+        "key": false,
+        "synonymMaps": []
+      },
+      {
+        "name": "Bundesland",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": true,
+        "retrievable": true,
+        "stored": true,
+        "sortable": true,
+        "facetable": true,
+        "key": false,
+        "synonymMaps": []
+      },
+      {
+        "name": "Baukategorie",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": true,
+        "retrievable": true,
+        "stored": true,
+        "sortable": true,
+        "facetable": true,
+        "key": false,
+        "synonymMaps": []
+      },
+      {
+        "name": "paragraph",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": true,
+        "retrievable": true,
+        "stored": true,
+        "sortable": true,
+        "facetable": true,
+        "key": false,
+        "synonymMaps": []
+      },
+      {
+        "name": "paragraphTitle",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": true,
+        "retrievable": true,
+        "stored": true,
+        "sortable": true,
+        "facetable": true,
+        "key": false,
+        "synonymMaps": []
+      },
+      {
+        "name": "subsection",
+        "type": "Edm.String",
+        "searchable": true,
+        "filterable": true,
+        "retrievable": true,
+        "stored": true,
+        "sortable": true,
+        "facetable": true,
+        "key": false,
+        "synonymMaps": []
+      }
+    ],
+    "scoringProfiles": [],
+    "suggesters": [],
+    "analyzers": [],
+    "normalizers": [],
+    "tokenizers": [],
+    "tokenFilters": [],
+    "charFilters": [],
+    "similarity": {
+      "@odata.type": "#Microsoft.Azure.Search.BM25Similarity"
+    },
+    "semantic": {
+      "defaultConfiguration": "bcl-data-semantic-configuration",
+      "configurations": [
+        {
+          "name": "bcl-data-semantic-configuration",
+          "prioritizedFields": {
+            "titleField": {
+              "fieldName": "title"
+            },
+            "prioritizedContentFields": [
+              {
+                "fieldName": "chunk"
+              }
+            ],
+            "prioritizedKeywordsFields": []
+          }
+        }
+      ]
+    },
+    "vectorSearch": {
+      "algorithms": [
+        {
+          "name": "bcl-data-algorithm",
+          "kind": "hnsw",
+          "hnswParameters": {
+            "metric": "cosine",
+            "m": 4,
+            "efConstruction": 400,
+            "efSearch": 500
+          }
+        }
+      ],
+      "profiles": [
+        {
+          "name": "bcl-data-azureOpenAi-text-profile",
+          "algorithm": "bcl-data-algorithm",
+          "vectorizer": "bcl-data-azureOpenAi-text-vectorizer"
+        }
+      ],
+      "vectorizers": [
+        {
+          "name": "bcl-data-azureOpenAi-text-vectorizer",
+          "kind": "azureOpenAI",
+          "azureOpenAIParameters": {
+            "resourceUri": "https://ai-service-bcl-app.openai.azure.com",
+            "deploymentId": "text-embedding-ada-002",
+            "modelName": "text-embedding-ada-002"
+          }
+        }
+      ],
+      "compressions": []
+    }
+  }
