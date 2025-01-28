@@ -101,7 +101,7 @@ if user_prompt:
                         "authentication": {
                             "type": "system_assigned_managed_identity"
                         },
-                        "top_k": 5,
+                        "top_k": 8,
                         "fields_mapping": {
                             "content_field": "chunk",
                             "vector_fields": ["text_vector"],
