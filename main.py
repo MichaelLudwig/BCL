@@ -97,6 +97,10 @@ if user_prompt:
                             "vector_fields": ["text_vector"],
                             "title_field": "title",
                             "metadata_fields": ["Bundesland", "Baukategorie"]
+                        },
+                        "hybrid_search": {
+                            "fields": ["text_vector"],
+                            "k": 5
                         }
                     }
                 }
