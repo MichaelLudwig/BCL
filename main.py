@@ -83,7 +83,7 @@ if user_prompt:
                     "type": "azure_search",
                     "parameters": {
                         "endpoint": "https://searchbclapp.search.windows.net",
-                        "index_name": "bcl-data",
+                        "index_name": "bcl-data2",
                         "authentication": {
                             "type": "system_assigned_managed_identity"
                         },
