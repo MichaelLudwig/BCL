@@ -58,11 +58,15 @@ if user_prompt:
         model=openAI_model,
         messages=[
             {"role": "system", "content": """Du bist ein hilfreicher Assistent für Bauordnungen. 
-            Suche in dem Index 'bcl-data' nach relevanten Informationen für die Antwort.
+            Suche in dem Index 'bcl-data2' nach relevanten Informationen für die Antwort.
             
-            Versuche dich sehr genau an den Inhalten der dir vorleigenden Inforamtionen zu halten. Referenziere alle Quellen nach jeder aussage im Format (refX).
+            Versuche dich sehr genau an den Inhalten der dir vorleigenden Inforamtionen zu halten. Referenziere alle Quellen nach jeder Aussage im Format (refX).
             Liste am Ende deiner Ausführungen die verwendeten Quellen mit dem Vollständigen Titel des Quelldokumentes welchen du aus dem Dokument extrahieren kannst,
             Paragraphnummer , Abschnittsnummer, Satznummer, Dokumenttitel {title}, Bundesland {Bundesland} und Baukategorie {Baukategorie} auf.
+             
+            Der Gesetzestext ist in chunks geteilt, um die Suche zu beschleunigen und das LLM zu entlasten.
+            Um die nötigen Informationen wie Paragraphnummer und Paragraphname zu finden, musst meist du die vorrangegangenen Chunks des Chunks durchsuchen, aus dem du die Information extrahiert hast.
+            Paragraphennummern und Titel stehen immer vor der Aussage im Chunk.
             
             Verwende und verweise immer auf die aktuellste Version der jeweiligen Bauordnung. Diese geht aus dem Titel der Quelle hervor.
             Die Bauorndung '04_SächsFeuVO_2007-10-15_inkl Änd 2020-03.pdf' wurde z.b. im März 2020 geändert.
@@ -87,7 +91,7 @@ if user_prompt:
                         "authentication": {
                             "type": "system_assigned_managed_identity"
                         },
-                        "top_k": 3,
+                        "top_k": 5,
                         "fields_mapping": {
                             "content_field": "chunk",
                             "vector_fields": ["text_vector"],
