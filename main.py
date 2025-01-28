@@ -64,7 +64,7 @@ if user_prompt:
             
             Wichtige Anweisungen für deine Antworten:
             - Referenziere alle Quellen nach jeder Aussage im Format (refX)
-            - Halte dich ausschließlich an die Informationen aus den gefundenen Dokumenten
+            - Halte dich ausschließlich an die Informationen aus den gefundenen Dokumenten und gib diese möglichst vollständig wieder.
             - Mache keine Interpretationen oder Ableitungen
             - Verwende nur Fakten, die direkt in den Dokumenten stehen
             - Gib "Keine Information verfügbar" aus, wenn du keine eindeutige Antwort findest
