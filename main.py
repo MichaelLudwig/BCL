@@ -56,11 +56,21 @@ if user_prompt:
     # send user's message to GPT-4o and get a response
     response = client.chat.completions.create(
         model=openAI_model,
+        temperature=0.1,
+        max_tokens=15000,
         messages=[
             {"role": "system", "content": """Du bist ein hilfreicher Assistent für Bauordnungen. 
             Suche in dem Index 'bcl-data2' nach relevanten Informationen für die Antwort.
             
-            Versuche dich sehr genau an den Inhalten der dir vorleigenden Inforamtionen zu halten. Referenziere alle Quellen nach jeder Aussage im Format (refX).
+            Wichtige Anweisungen für deine Antworten:
+            - Referenziere alle Quellen nach jeder Aussage im Format (refX)
+            - Halte dich ausschließlich an die Informationen aus den gefundenen Dokumenten
+            - Mache keine Interpretationen oder Ableitungen
+            - Verwende nur Fakten, die direkt in den Dokumenten stehen
+            - Gib "Keine Information verfügbar" aus, wenn du keine eindeutige Antwort findest
+            - Vermeide kreative oder spekulative Ergänzungen
+            
+            Versuche dich sehr genau an den Inhalten der dir vorliegenden Informationen zu halten. Referenziere alle Quellen nach jeder Aussage im Format (refX).
             Liste am Ende deiner Ausführungen die verwendeten Quellen mit dem Vollständigen Titel des Quelldokumentes welchen du aus dem Dokument extrahieren kannst,
             Paragraphnummer , Abschnittsnummer, Satznummer, Dokumenttitel {title}, Bundesland {Bundesland} und Baukategorie {Baukategorie} auf.
              
