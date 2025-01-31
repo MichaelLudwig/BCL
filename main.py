@@ -125,6 +125,14 @@ if user_prompt:
     with st.chat_message("assistant"):
         st.markdown(assistant_response)
         st.text("Prompt Token: " + str(response.usage.prompt_tokens) + " Response Token: " + str(response.usage.completion_tokens))
+        
+        # Zeige Suchergebnisse und Scores
+        if hasattr(response.choices[0].message, 'context'):
+            st.write("### Verwendete Chunks:")
+            for idx, source in enumerate(response.choices[0].message.context.messages[0].data_sources):
+                st.write(f"\n**Chunk {idx + 1}**")
+                st.write(f"Score: {source.search_score}")
+                st.write(f"Content: {source.content}")
 
 
 
