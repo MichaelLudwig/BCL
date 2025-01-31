@@ -127,7 +127,7 @@ if user_prompt:
         st.text("Prompt Token: " + str(response.usage.prompt_tokens) + " Response Token: " + str(response.usage.completion_tokens))
         
         # Zeige Suchergebnisse und Scores
-        st.json(response.choices[0].message.context.citations)
+        st.json(response.choices[0].message.context)
 
 
 
