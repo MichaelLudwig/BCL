@@ -127,13 +127,13 @@ if user_prompt:
         st.text("Prompt Token: " + str(response.usage.prompt_tokens) + " Response Token: " + str(response.usage.completion_tokens))
         
         # Zeige Suchergebnisse und Scores
-        if hasattr(response.choices[0].message, 'context') and hasattr(response.choices[0].message.context, 'citations'):
-            st.write("### Verwendete Chunks:")
-            for idx, citation in enumerate(response.choices[0].message.context.citations):
-                st.write(f"\n**Chunk {idx + 1}**")
-                if hasattr(citation, 'title'):
-                    st.write(f"Titel: {citation.title}")
-                st.write(f"Content: {citation.content[:50]}...")
+        st.write(response.choices[0].message.context)
+        #if hasattr(response.choices[0].message, 'context') and hasattr(response.choices[0].message.context, 'citations'):
+        #    st.write("### Verwendete Chunks:")
+        #    for idx, citation in enumerate(response.choices[0].message.context.citations):
+        #        st.write(f"\n**Chunk {idx + 1}**")
+        #        st.write(f"Titel: {citation.title}")
+        #        st.write(f"Content: {citation.content[:50]}...")
 
 
 
