@@ -5,10 +5,16 @@ import os
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from dotenv import load_dotenv
 
-st.set_page_config(layout="wide")
+
 
 # Lade Umgebungsvariablen aus .env
 load_dotenv()
+
+st.set_page_config(
+    page_title="BCL AI Chat",
+    page_icon="🤖",
+    layout="wide"
+)
 
 # OpenAI API Aufruf -------------------------------------------------------------
 
@@ -44,7 +50,6 @@ for message in st.session_state.chat_history:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-
 # input field for user's message
 user_prompt = st.chat_input("Frag GPT-4o-mini...")
 
@@ -72,7 +77,9 @@ if user_prompt:
             
             Versuche dich sehr genau an den Inhalten der dir vorliegenden Informationen zu halten. Referenziere alle Quellen nach jeder Aussage im Format (refX).
             Liste am Ende deiner Ausführungen die verwendeten Quellen mit dem Vollständigen Titel des Quelldokumentes welchen du aus dem Dokument extrahieren kannst,
-            Paragraphnummer , Abschnittsnummer, Satznummer, Dokumenttitel {title}, Bundesland {Bundesland} und Baukategorie {Baukategorie} auf.
+            Paragraphnummer , Abschnittsnummer, Satznummer, Dokumenttitel {title}, Bundesland {Bundesland} und Baukategorie {Baukategorie} auf. 
+             Die Information zu Bundesland und Baukategorie ist in dem Feld filepath enthalten. Hier ein Beispiel: https://storedlzdivyxevanm.blob.core.windows.net/documents/Regelwerke/Sachsen/Garagen/S%C3%A4chsGarVO_1995-01_inkl.%20%C3%84nd_2004.pdf
+             In dem Ordner Regelwerke liegen jeweils die Unterordner für die Bundesländer. Darunter liegen die Unterordner für die Baukategorien.
              
             Der Gesetzestext ist in chunks geteilt, um die Suche zu beschleunigen und das LLM zu entlasten.
             Um die nötigen Informationen wie Paragraphnummer und Paragraphname zu finden, musst meist du die vorrangegangenen Chunks des Chunks durchsuchen, aus dem du die Information extrahiert hast.
