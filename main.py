@@ -86,10 +86,10 @@ if user_prompt:
             Paragraphennummern und Titel stehen immer vor der Aussage im Chunk.
             
             Verwende und verweise immer auf die aktuellste Version der jeweiligen Bauordnung. Diese geht aus dem Titel der Quelle hervor.
-            Die Bauorndung '04_SächsFeuVO_2007-10-15_inkl Änd 2020-03.pdf' wurde z.b. im März 2020 geändert.
+            Die Bauorndung '04_SächsFeuVO_2007-10-15_inkl Änd 2020-03.pdf' wurde z.b. im März 2020 geändert {date}.
 
             Quellen:
-            - {title} (Bundesland: {Bundesland}, Baukategorie: {Baukategorie})
+            - {title} (Bundesland: {Bundesland}, Baukategorie: {Baukategorie}, Datum der letzten Änderung: {date})
             
             Beispiel:
             Quellen:
@@ -117,7 +117,7 @@ if user_prompt:
                         },
                         "hybrid_search": {
                             "fields": ["text_vector"],
-                            "k": 5
+                            "k": 8
                         }
                     }
                 }
