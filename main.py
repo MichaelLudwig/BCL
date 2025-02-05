@@ -78,6 +78,7 @@ if user_prompt:
             Versuche dich sehr genau an den Inhalten der dir vorliegenden Informationen zu halten. Referenziere alle Quellen nach jeder Aussage im Format (refX).
             Liste am Ende deiner Ausführungen die verwendeten Quellen mit dem Vollständigen Titel des Quelldokumentes welchen du aus dem Dokument extrahieren kannst,
             Paragraphnummer , Abschnittsnummer, Satznummer, Dokumenttitel {title}, Bundesland {Bundesland} und Baukategorie {Baukategorie} auf. 
+             Sollte das Dokument keine Paragraphen enthalten, so gib die Information zu Kapitel und Unterkapitel an.
              Die Information zu Bundesland und Baukategorie ist in dem Feld filepath enthalten. Hier ein Beispiel: https://storedlzdivyxevanm.blob.core.windows.net/documents/Regelwerke/Sachsen/Garagen/S%C3%A4chsGarVO_1995-01_inkl.%20%C3%84nd_2004.pdf
              In dem Ordner Regelwerke liegen jeweils die Unterordner für die Bundesländer. Darunter liegen die Unterordner für die Baukategorien.
              
@@ -94,7 +95,9 @@ if user_prompt:
             Beispiel:
             Quellen:
             - (ref1):   $ 5 Abschnitt 4 Satze 3 aus der Verordnung des Sächsischen Staatsministeriums für Regionalentwicklung zur Änderung der Ressortbezeichnung 
-                        SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf (Bundesland: Sachsen, Baukategorie: Bauordnung)
+                        SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf (Bundesland: Sachsen, Baukategorie: Bauordnung, Datum der letzten Änderung: 2022-06)
+            - (ref2):   2.6 Sicherheitsbeleuchtung und 2.7 Blitzschutzanlagen aus der Verordnung des Sächsischen Staatsministeriums für Regionalentwicklung zur Änderung der Ressortbezeichnung 
+                        SächsBO_2016-05_inkl Änd 2022-06_mit Begründung-Auszügen.pdf (Bundesland: Sachsen, Baukategorie: Bauordnung, Datum der letzten Änderung: 2022-06)
             """},
             *st.session_state.chat_history
         ],
