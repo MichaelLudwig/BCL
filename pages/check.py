@@ -174,6 +174,15 @@ def extract_document_content(file):
 with st.sidebar:
     st.title("Dokument Upload")
     
+    # Authentication Switch
+    st.write("### Authentifizierung")
+    use_managed_identity = st.toggle("Managed Identity verwenden", value=True, help="Deaktivieren für lokale Tests mit API Key")
+    if not use_managed_identity:
+        st.info("Lokaler Modus: Verwendet API Key Authentifizierung")
+    
+    # Environment Variable setzen
+    os.environ['WEBSITE_INSTANCE_ID'] = '1' if use_managed_identity else ''
+    
     # File Uploader in der Seitenleiste
     uploaded_file = st.file_uploader("Word-Dokument hochladen", type=['docx'])
     

@@ -57,6 +57,7 @@ class OpenAIAPI:
             )
         
         self.model = "gpt-4o-mini"
+        self.use_managed_identity = os.getenv('WEBSITE_INSTANCE_ID', False)
 
     def extract_document_info(self, content: str) -> Dokumenteninfo:
         """Extrahiert Dokumentinformationen aus dem Inhalt mittels Azure OpenAI"""
@@ -172,6 +173,14 @@ class OpenAIAPI:
         """
         
         try:
+            # Authentifizierungskonfiguration basierend auf Environment
+            search_auth = {
+                "type": "system_assigned_managed_identity"
+            } if self.use_managed_identity else {
+                "type": "api_key",
+                "key": os.getenv('AZURE_SEARCH_KEY')
+            }
+
             response = self.client.chat.completions.create(
                 model=self.model,
                 temperature=0.1,
@@ -188,9 +197,7 @@ class OpenAIAPI:
                             "parameters": {
                                 "endpoint": "https://searchbclapp.search.windows.net",
                                 "index_name": "bcl-data2",
-                                "authentication": {
-                                    "type": "system_assigned_managed_identity"
-                                },
+                                "authentication": search_auth,
                                 "top_k": 5,
                                 "fields_mapping": {
                                     "content_field": "chunk",
