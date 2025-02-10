@@ -198,7 +198,7 @@ class OpenAIAPI:
                                 "endpoint": "https://searchbclapp.search.windows.net",
                                 "index_name": "bcl-data2",
                                 "authentication": search_auth,
-                                "top_k": 5,
+                                "top_k": 4,
                                 "fields_mapping": {
                                     "content_field": "chunk",
                                     "vector_fields": ["text_vector"],
@@ -207,7 +207,7 @@ class OpenAIAPI:
                                 },
                                 "hybrid_search": {
                                     "fields": ["text_vector"],
-                                    "k": 5
+                                    "k": 4
                                 }
                             }
                         }
@@ -243,17 +243,22 @@ class OpenAIAPI:
             # Formatiere die Prüfberichte als Text
             reports = []
             for pruefbericht in pruefberichte:
+                # Erstelle den Prüfergebnistext
+                pruefergebnis_text = pruefbericht.pruefergebnis
+                
+                # Füge Mängel hinzu, falls vorhanden
+                if pruefbericht.maengel:
+                    pruefergebnis_text += "\n\nFestgestellte Mängel:\n" + "\n".join(f"- {m}" for m in pruefbericht.maengel)
+                
+                # Füge Empfehlungen hinzu, falls vorhanden
+                if pruefbericht.empfehlungen:
+                    pruefergebnis_text += "\n\nEmpfehlungen:\n" + "\n".join(f"- {e}" for e in pruefbericht.empfehlungen)
+
                 report_text = f"""Zusammenfassung:
 {pruefbericht.zusammenfassung}
 
 Prüfergebnis:
-{pruefbericht.pruefergebnis}
-
-Festgestellte Mängel:
-{"- " + chr(10).join("- " + m for m in pruefbericht.maengel) if pruefbericht.maengel else "Keine Mängel festgestellt"}
-
-Empfehlungen:
-{"- " + chr(10).join("- " + e for e in pruefbericht.empfehlungen) if pruefbericht.empfehlungen else "Keine Empfehlungen notwendig"}
+{pruefergebnis_text}
 
 Verwendete Quellen:
 {"- " + chr(10).join("- " + q for q in pruefbericht.quellen) if pruefbericht.quellen else "Keine Quellen angegeben"}"""

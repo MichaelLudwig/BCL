@@ -265,6 +265,7 @@ else:
                                             with st.spinner(f"Prüfe Kapitel '{chapter_key}'..."):
                                                 # Sammle alle Unterkapitel mit Inhalt
                                                 chapters_to_check = []
+                                                chapter_mapping = {}  # Neue Map für die Zuordnung
                                                 
                                                 # Füge Hauptkapitelinhalt hinzu, falls vorhanden
                                                 if subchapter['content'].strip():
@@ -273,6 +274,7 @@ else:
                                                         'number': subchapter.get('number', ''),
                                                         'content': subchapter['content']
                                                     })
+                                                    chapter_mapping[len(chapters_to_check) - 1] = f"{i}_main"
                                                 
                                                 # Füge Unterkapitel hinzu
                                                 for j, subsubchapter in enumerate(subchapter['subchapters']):
@@ -282,6 +284,7 @@ else:
                                                             'number': subsubchapter.get('number', ''),
                                                             'content': subsubchapter['content']
                                                         })
+                                                        chapter_mapping[len(chapters_to_check) - 1] = f"{i}_{j}"
                                                 
                                                 if chapters_to_check:
                                                     # Prüfe alle Unterkapitel in einer Anfrage
@@ -301,14 +304,8 @@ else:
                                                     
                                                     # Speichere die Prüfberichte für jedes Unterkapitel
                                                     for j, (chapter, report) in enumerate(zip(chapters_to_check, result['reports'])):
-                                                        # Bestimme den korrekten Schlüssel basierend darauf, ob es sich um das Hauptkapitel handelt
-                                                        if j == 0 and chapter['title'] == subchapter['title']:
-                                                            # Dies ist das Hauptkapitel
-                                                            subchapter_key = f"{i}_main"
-                                                        else:
-                                                            # Dies ist ein Unterkapitel
-                                                            subchapter_key = f"{i}_{j-1}"  # -1 weil das Hauptkapitel bereits gezählt wurde
-                                                    
+                                                        # Verwende die Mapping-Tabelle für die korrekte Zuordnung
+                                                        subchapter_key = chapter_mapping[j]
                                                         
                                                         st.session_state['chapters_data'][chapter_key]['subchapter_reports'][subchapter_key] = {
                                                             'report': report,
@@ -321,7 +318,7 @@ else:
                                         except Exception as e:
                                             st.error(f"Fehler bei der Prüfung: {str(e)}")
                                 
-                                # Zeige Hauptkapitelinhalt, falls vorhanden
+                                # Zeige Hauptkapitelinhalt, falls vorhanden 
                                 if subchapter['content'].strip():
                                     st.markdown("### Hauptkapitelinhalt")
                                     main_content_col, main_report_col = st.columns([1, 1])
