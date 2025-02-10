@@ -274,38 +274,37 @@ else:
                                         # Führe die KI-Prüfung durch
                                         try:
                                             with st.spinner(f"Prüfe Kapitel '{chapter_key}'..."):
-                                                report = openai_api.check_chapter(
-                                                    subchapter['content'],
-                                                    doc_info
-                                                )
-                                                st.session_state['chapters_data'][chapter_key]['report'] = report
+                                                # Sammle alle Unterkapitel mit Inhalt
+                                                chapters_to_check = []
+                                                for j, subsubchapter in enumerate(subchapter['subchapters']):
+                                                    if subsubchapter['content'].strip():
+                                                        chapters_to_check.append({
+                                                            'title': subsubchapter['title'],
+                                                            'number': subsubchapter.get('number', ''),
+                                                            'content': subsubchapter['content']
+                                                        })
+                                                
+                                                if chapters_to_check:
+                                                    # Prüfe alle Unterkapitel in einer Anfrage
+                                                    result = openai_api.check_chapter(
+                                                        chapters_to_check,
+                                                        doc_info
+                                                    )
+                                                    
+                                                    # Initialisiere subchapter_reports im Session State
+                                                    if 'subchapter_reports' not in st.session_state['chapters_data'][chapter_key]:
+                                                        st.session_state['chapters_data'][chapter_key]['subchapter_reports'] = {}
+                                                    
+                                                    # Speichere die Prüfberichte für jedes Unterkapitel
+                                                    for j, (subsubchapter, report) in enumerate(zip(chapters_to_check, result['reports'])):
+                                                        subchapter_key = f"{i}_{j}"
+                                                        st.session_state['chapters_data'][chapter_key]['subchapter_reports'][subchapter_key] = {
+                                                            'report': report,
+                                                            'citations': result['citations']
+                                                        }
+                                                
                                         except Exception as e:
                                             st.error(f"Fehler bei der Prüfung: {str(e)}")
-                                
-                                # Nur wenn das Unterkapitel Inhalt hat, zeigen wir die Textfelder an
-                                if subchapter['content'].strip():
-                                    content_col, report_col = st.columns([1, 1])
-                                    
-                                    with content_col:
-                                        st.text_area(
-                                            "Kapitelinhalt",
-                                            value=subchapter['content'],
-                                            height=200,
-                                            key=f"content_{i}"
-                                        )
-                                    
-                                    with report_col:
-                                        report_value = ""
-                                        if 'chapters_data' in st.session_state and \
-                                           subchapter['title'] in st.session_state['chapters_data']:
-                                            report_value = st.session_state['chapters_data'][subchapter['title']].get('report', '')
-                                        
-                                        st.text_area(
-                                            "Prüfbericht",
-                                            value=report_value,
-                                            height=200,
-                                            key=f"report_{i}"
-                                        )
                                 
                                 # Unter-Unterkapitel
                                 for j, subsubchapter in enumerate(subchapter['subchapters']):
@@ -325,14 +324,32 @@ else:
                                             )
                                         
                                         with sub_report_col:
+                                            # Hole den Prüfbericht für das Unterkapitel
+                                            subreport_value = ""
+                                            if 'chapters_data' in st.session_state and \
+                                               subchapter['title'] in st.session_state['chapters_data'] and \
+                                               'subchapter_reports' in st.session_state['chapters_data'][subchapter['title']]:
+                                                subchapter_key = f"{i}_{j}"
+                                                if subchapter_key in st.session_state['chapters_data'][subchapter['title']]['subchapter_reports']:
+                                                    subreport_value = st.session_state['chapters_data'][subchapter['title']]['subchapter_reports'][subchapter_key]['report']
+                                            
                                             st.text_area(
                                                 "Prüfbericht",
-                                                value="",
+                                                value=subreport_value,
                                                 height=150,
                                                 key=f"subreport_{i}_{j}"
                                             )
+                                            
+                                            # Zeige Citations für Unterkapitel
+                                            if 'chapters_data' in st.session_state and \
+                                               subchapter['title'] in st.session_state['chapters_data'] and \
+                                               'subchapter_reports' in st.session_state['chapters_data'][subchapter['title']]:
+                                                subchapter_key = f"{i}_{j}"
+                                                if subchapter_key in st.session_state['chapters_data'][subchapter['title']]['subchapter_reports']:
+                                                    with st.expander("Verwendete Quellen", expanded=False):
+                                                        st.json(st.session_state['chapters_data'][subchapter['title']]['subchapter_reports'][subchapter_key]['citations'])
                                 
-                                st.markdown("---")  # Trennlinie zwischen den Kapiteln 
+                                st.markdown("---")  # Trennlinie zwischen den Kapiteln
                     
             except Exception as e:
                 st.error(f"Fehler bei der Analyse: {str(e)}")

@@ -3,7 +3,7 @@ import json
 import openai
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Dict, Any, Optional
 
 # Pydantic Model für die Dokumentenstruktur
 class Dokumenteninfo(BaseModel):
@@ -16,6 +16,27 @@ class Dokumenteninfo(BaseModel):
     bauordnungsrechtliche_grundlagen: List[str] = Field(
         description="Liste der relevanten bauordnungsrechtlichen Grundlagen und Vorschriften"
     )
+
+class Unterkapitel(BaseModel):
+    titel: str = Field(description="Titel des Unterkapitels")
+    nummer: Optional[str] = Field(description="Nummer des Unterkapitels (falls vorhanden)")
+    inhalt: str = Field(description="Inhalt des Unterkapitels")
+
+class Pruefbericht(BaseModel):
+    zusammenfassung: str = Field(description="Zusammenfassung der wichtigsten Aussagen des Kapitels")
+    pruefergebnis: str = Field(description="Detaillierte Prüfung mit Verweis auf relevante Vorschriften")
+    maengel: List[str] = Field(description="Liste der festgestellten Mängel oder fehlenden Angaben")
+    empfehlungen: List[str] = Field(description="Liste der Empfehlungen zur Überarbeitung")
+    quellen: List[str] = Field(description="Liste der verwendeten Quellen im Format (refX)")
+
+class KapitelPruefung(BaseModel):
+    unterkapitel: List[Unterkapitel] = Field(description="Liste der zu prüfenden Unterkapitel")
+    pruefberichte: List[Pruefbericht] = Field(description="Liste der Prüfberichte für die Unterkapitel")
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if len(self.unterkapitel) != len(self.pruefberichte):
+            raise ValueError("Anzahl der Unterkapitel muss mit Anzahl der Prüfberichte übereinstimmen")
 
 class OpenAIAPI:
     def __init__(self):
@@ -105,37 +126,49 @@ class OpenAIAPI:
         except Exception as e:
             raise Exception(f"Fehler bei der Verarbeitung der OpenAI-Antwort: {str(e)}")
 
-    def check_chapter(self, chapter_content: str, doc_info: Dokumenteninfo) -> str:
-        """Prüft ein Kapitel des Brandschutzkonzepts auf Basis der Bauordnungen"""
+    def check_chapter(self, chapter_content: List[Dict[str, str]], doc_info: Dokumenteninfo) -> Dict[str, Any]:
+        """Prüft alle Unterkapitel des Brandschutzkonzepts in einer Anfrage"""
         
         system_prompt = """Du bist ein Experte für Brandschutz und die Prüfung von Brandschutzkonzepten.
-        Deine Aufgabe ist es, das vorliegende Kapitel eines Brandschutzkonzepts auf Basis der geltenden Bauordnungen und Vorschriften zu prüfen.
+        Deine Aufgabe ist es, die vorliegenden Unterkapitel eines Brandschutzkonzepts auf Basis der geltenden Bauordnungen und Vorschriften zu prüfen.
         
-        Prüfe dabei insbesondere:
+        Prüfe für jedes Unterkapitel insbesondere:
         - Ob die getroffenen Aussagen den geltenden Vorschriften entsprechen
         - Ob alle notwendigen Angaben vorhanden sind
         - Ob die Maßnahmen ausreichend sind
         - Ob Widersprüche zu den geltenden Vorschriften bestehen
         
-        Formuliere deine Antwort als strukturierten Prüfbericht mit:
-        1. Zusammenfassung der wichtigsten Aussagen
-        2. Prüfergebnis mit Verweis auf die relevanten Vorschriften
-        3. Festgestellte Mängel oder fehlende Angaben
-        4. Empfehlungen zur Überarbeitung (falls notwendig)
+        Gib deine Antwort als Array von Prüfberichten zurück, wobei jeder Prüfbericht folgendes Format hat:
+        {
+            "zusammenfassung": "Kurze Zusammenfassung der wichtigsten Aussagen",
+            "pruefergebnis": "Detaillierte Prüfung mit Verweis auf relevante Vorschriften",
+            "maengel": ["Mangel 1", "Mangel 2", ...],
+            "empfehlungen": ["Empfehlung 1", "Empfehlung 2", ...],
+            "quellen": ["(ref1)", "(ref2)", ...]
+        }
         
+        Die Reihenfolge der Prüfberichte muss der Reihenfolge der übergebenen Unterkapitel entsprechen.
         Referenziere alle Quellen nach jeder Aussage im Format (refX).
         """
         
+        # Formatiere die Unterkapitel für den Prompt
+        chapters_text = "\n\n".join([
+            f"Unterkapitel {i+1}: {chapter['title']}\n" +
+            (f"Nummer: {chapter['number']}\n" if chapter.get('number') else "") +
+            f"Inhalt:\n{chapter['content']}"
+            for i, chapter in enumerate(chapter_content)
+        ])
+        
         user_prompt = f"""
-        Prüfe das folgende Kapitel eines Brandschutzkonzepts.
+        Prüfe die folgenden Unterkapitel eines Brandschutzkonzepts.
         
         Relevante Informationen zum Bauvorhaben:
         - Bauvorhaben: {doc_info.bauvorhaben}
         - Bundesland: {doc_info.bundesland}
         - Bauordnungsrechtliche Grundlagen: {', '.join(doc_info.bauordnungsrechtliche_grundlagen)}
         
-        Zu prüfender Kapitelinhalt:
-        {chapter_content}
+        Zu prüfende Unterkapitel:
+        {chapters_text}
         """
         
         try:
@@ -147,6 +180,7 @@ class OpenAIAPI:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
+                response_format={"type": "json_object"},
                 extra_body={
                     "data_sources": [
                         {
@@ -174,7 +208,36 @@ class OpenAIAPI:
                 }
             )
             
-            return response.choices[0].message.content
+            # Parse die JSON-Antwort in das Pydantic Model
+            result = json.loads(response.choices[0].message.content)
+            if not isinstance(result, list):
+                result = [result]  # Fallback für den Fall, dass nur ein Bericht zurückgegeben wird
+                
+            pruefberichte = [Pruefbericht(**report) for report in result]
+            
+            # Formatiere die Prüfberichte als Text
+            reports = []
+            for pruefbericht in pruefberichte:
+                report_text = f"""Zusammenfassung:
+{pruefbericht.zusammenfassung}
+
+Prüfergebnis:
+{pruefbericht.pruefergebnis}
+
+Festgestellte Mängel:
+{"- " + chr(10).join("- " + m for m in pruefbericht.maengel) if pruefbericht.maengel else "Keine Mängel festgestellt"}
+
+Empfehlungen:
+{"- " + chr(10).join("- " + e for e in pruefbericht.empfehlungen) if pruefbericht.empfehlungen else "Keine Empfehlungen notwendig"}
+
+Verwendete Quellen:
+{"- " + chr(10).join("- " + q for q in pruefbericht.quellen) if pruefbericht.quellen else "Keine Quellen angegeben"}"""
+                reports.append(report_text)
+            
+            return {
+                "reports": reports,
+                "citations": response.choices[0].message.context.get("citations", [])
+            }
             
         except Exception as e:
-            raise Exception(f"Fehler bei der Prüfung des Kapitels: {str(e)}") 
+            raise Exception(f"Fehler bei der Prüfung der Unterkapitel: {str(e)}") 
