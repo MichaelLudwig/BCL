@@ -1,11 +1,7 @@
 import streamlit as st
-import openai
-from openai import OpenAI
 import os
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from dotenv import load_dotenv
-
-
+from openai_api import OpenAIAPI
 
 # Lade Umgebungsvariablen aus .env
 load_dotenv()
@@ -16,29 +12,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# OpenAI API Aufruf -------------------------------------------------------------
-
-if os.getenv('WEBSITE_INSTANCE_ID'):
-    token_provider = get_bearer_token_provider(
-        DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
-    )
-    client = openai.AzureOpenAI(
-        azure_ad_token_provider=token_provider,
-        api_version="2024-04-01-preview",
-        azure_endpoint="https://ai-service-BCL-app.openai.azure.com/"        
-    )
-else:
-    st.write("Locale Testumgebung")
-    client = openai.AzureOpenAI(
-        api_key=os.getenv('AZURE_OPENAI_API_KEY'),
-        api_version="2024-04-01-preview",
-        azure_endpoint="https://ai-service-BCL-app.openai.azure.com/"
-    )
-openAI_model = "gpt-4o-mini"
+# OpenAI API Client initialisieren
+openai_api = OpenAIAPI()
 
 # Chat Interface -------------------------------------------------------------
 
-# initialize chat session in streamlit if not already present
+# initialize chat session in streamlit if not already present 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
@@ -59,8 +38,8 @@ if user_prompt:
     st.session_state.chat_history.append({"role": "user", "content": user_prompt})
 
     # send user's message to GPT-4o and get a response
-    response = client.chat.completions.create(
-        model=openAI_model,
+    response = openai_api.client.chat.completions.create(
+        model=openai_api.model,
         temperature=0.1,
         max_tokens=15000,
         messages=[
