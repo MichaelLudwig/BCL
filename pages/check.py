@@ -300,6 +300,17 @@ else:
                                                         doc_info
                                                     )
                                                     
+                                                    # Zeige Debug-Informationen an
+                                                    if "debug_info" in result:
+                                                        with st.expander("Debug Informationen", expanded=True):
+                                                            st.write("### Debug Informationen")
+                                                            st.json(result["debug_info"])
+                                                    
+                                                    # Wenn ein Fehler aufgetreten ist
+                                                    if "error" in result:
+                                                        st.error(result["error"])
+                                                        continue
+                                                    
                                                     # Initialisiere subchapter_reports im Session State
                                                     if 'subchapter_reports' not in st.session_state['chapters_data'][chapter_key]:
                                                         st.session_state['chapters_data'][chapter_key]['subchapter_reports'] = {}
