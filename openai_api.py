@@ -181,8 +181,6 @@ class OpenAIAPI:
                 "key": os.getenv('AZURE_SEARCH_KEY')
             }
 
-            print(f"Verwende Authentifizierung: {search_auth['type']}")  # Debug-Ausgabe
-            
             response = self.client.chat.completions.create(
                 model=self.model,
                 temperature=0.1,
@@ -217,17 +215,22 @@ class OpenAIAPI:
                 }
             )
             
-            # Debug-Ausgaben
-            print(f"OpenAI Response Status: {response.model_dump_json()}")
-            print(f"Response Content: {response.choices[0].message.content if response.choices else 'Keine Antwort'}")
+            # Debug-Informationen sammeln
+            debug_info = {
+                "response_status": response.model_dump_json(),
+                "raw_content": response.choices[0].message.content if response.choices else None,
+                "context": response.choices[0].message.context if response.choices else None,
+                "auth_type": search_auth["type"]
+            }
             
             # Parse die JSON-Antwort in das Pydantic Model
             try:
                 result = json.loads(response.choices[0].message.content)
             except json.JSONDecodeError as e:
-                print(f"JSON Parsing Error: {str(e)}")
-                print(f"Problematischer Content: {response.choices[0].message.content}")
-                raise Exception(f"Ungültiges JSON-Format in der Antwort: {str(e)}")
+                return {
+                    "error": "Die KI-Antwort enthielt kein gültiges JSON-Format",
+                    "debug_info": debug_info
+                }
                 
             if not isinstance(result, list):
                 result = [result]  # Fallback für den Fall, dass nur ein Bericht zurückgegeben wird
@@ -255,11 +258,17 @@ Verwendete Quellen:
             
             return {
                 "reports": reports,
-                "citations": response.choices[0].message.context.get("citations", [])
+                "citations": response.choices[0].message.context.get("citations", []),
+                "debug_info": debug_info
             }
             
         except Exception as e:
-            print(f"Fehler in check_chapter: {str(e)}")  # Debug-Ausgabe
-            if hasattr(e, 'response'):
-                print(f"API Response: {e.response}")  # Debug-Ausgabe
-            raise Exception(f"Fehler bei der Prüfung der Unterkapitel: {str(e)}") 
+            debug_info = {
+                "error_type": type(e).__name__,
+                "error_message": str(e),
+                "auth_type": search_auth["type"]
+            }
+            return {
+                "error": f"Fehler bei der Prüfung der Unterkapitel: {str(e)}",
+                "debug_info": debug_info
+            } 
