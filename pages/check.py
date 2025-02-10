@@ -244,7 +244,7 @@ else:
                     for grundlage in doc_info.bauordnungsrechtliche_grundlagen:
                         st.write(f"- {grundlage}")
                 
-                # Kapitelstruktur anzeigen
+                # Kapitelstruktur anzeigen 
                 st.write("# Brandschutztechnisches Gesamtkonzept")
                 
                 if 'chapter_structure' in st.session_state and st.session_state['chapter_structure']['brandschutzkonzept']:
@@ -285,6 +285,16 @@ else:
                                             with st.spinner(f"Prüfe Kapitel '{chapter_key}'..."):
                                                 # Sammle alle Unterkapitel mit Inhalt
                                                 chapters_to_check = []
+                                                
+                                                # Füge Hauptkapitelinhalt hinzu, falls vorhanden
+                                                if subchapter['content'].strip():
+                                                    chapters_to_check.append({
+                                                        'title': subchapter['title'],
+                                                        'number': subchapter.get('number', ''),
+                                                        'content': subchapter['content']
+                                                    })
+                                                
+                                                # Füge Unterkapitel hinzu
                                                 for j, subsubchapter in enumerate(subchapter['subchapters']):
                                                     if subsubchapter['content'].strip():
                                                         chapters_to_check.append({
@@ -300,12 +310,6 @@ else:
                                                         doc_info
                                                     )
                                                     
-                                                    # Zeige Debug-Informationen an
-                                                    if "debug_info" in result:
-                                                        with st.expander("Debug Informationen", expanded=True):
-                                                            st.write("### Debug Informationen")
-                                                            st.json(result["debug_info"])
-                                                    
                                                     # Wenn ein Fehler aufgetreten ist
                                                     if "error" in result:
                                                         st.error(result["error"])
@@ -316,15 +320,66 @@ else:
                                                         st.session_state['chapters_data'][chapter_key]['subchapter_reports'] = {}
                                                     
                                                     # Speichere die Prüfberichte für jedes Unterkapitel
-                                                    for j, (subsubchapter, report) in enumerate(zip(chapters_to_check, result['reports'])):
-                                                        subchapter_key = f"{i}_{j}"
+                                                    for j, (chapter, report) in enumerate(zip(chapters_to_check, result['reports'])):
+                                                        # Bestimme den korrekten Schlüssel basierend darauf, ob es sich um das Hauptkapitel handelt
+                                                        if j == 0 and chapter['title'] == subchapter['title']:
+                                                            # Dies ist das Hauptkapitel
+                                                            subchapter_key = f"{i}_main"
+                                                        else:
+                                                            # Dies ist ein Unterkapitel
+                                                            subchapter_key = f"{i}_{j-1}"  # -1 weil das Hauptkapitel bereits gezählt wurde
+                                                        
+                                                        st.write(f"Debug - Speichere Bericht für: {chapter['title']} mit Schlüssel: {subchapter_key}")
+                                                        
                                                         st.session_state['chapters_data'][chapter_key]['subchapter_reports'][subchapter_key] = {
                                                             'report': report,
                                                             'citations': result['citations']
                                                         }
+                                                    
+                                                    # Zeige Token-Nutzung an
+                                                    st.info(f"Token-Nutzung - Prompt: {result.get('usage', {}).get('prompt_tokens', 'N/A')} | Response: {result.get('usage', {}).get('completion_tokens', 'N/A')}")
                                                 
                                         except Exception as e:
                                             st.error(f"Fehler bei der Prüfung: {str(e)}")
+                                
+                                # Zeige Hauptkapitelinhalt, falls vorhanden
+                                if subchapter['content'].strip():
+                                    st.markdown("### Hauptkapitelinhalt")
+                                    main_content_col, main_report_col = st.columns([1, 1])
+                                    
+                                    with main_content_col:
+                                        st.text_area(
+                                            "Kapitelinhalt",
+                                            value=subchapter['content'],
+                                            height=300,
+                                            key=f"maincontent_{i}"
+                                        )
+                                    
+                                    with main_report_col:
+                                        # Hole den Prüfbericht für das Hauptkapitel
+                                        mainreport_value = ""
+                                        if 'chapters_data' in st.session_state and \
+                                           subchapter['title'] in st.session_state['chapters_data'] and \
+                                           'subchapter_reports' in st.session_state['chapters_data'][subchapter['title']]:
+                                            main_key = f"{i}_main"
+                                            if main_key in st.session_state['chapters_data'][subchapter['title']]['subchapter_reports']:
+                                                mainreport_value = st.session_state['chapters_data'][subchapter['title']]['subchapter_reports'][main_key]['report']
+                                        
+                                        st.text_area(
+                                            "Prüfbericht",
+                                            value=mainreport_value,
+                                            height=300,
+                                            key=f"mainreport_{i}"
+                                        )
+                                        
+                                        # Zeige Citations für Hauptkapitel
+                                        if 'chapters_data' in st.session_state and \
+                                           subchapter['title'] in st.session_state['chapters_data'] and \
+                                           'subchapter_reports' in st.session_state['chapters_data'][subchapter['title']]:
+                                            main_key = f"{i}_main"
+                                            if main_key in st.session_state['chapters_data'][subchapter['title']]['subchapter_reports']:
+                                                with st.expander("Verwendete Quellen", expanded=False):
+                                                    st.json(st.session_state['chapters_data'][subchapter['title']]['subchapter_reports'][main_key]['citations'])
                                 
                                 # Unter-Unterkapitel
                                 for j, subsubchapter in enumerate(subchapter['subchapters']):
@@ -339,7 +394,7 @@ else:
                                             st.text_area(
                                                 "Unterkapitelinhalt",
                                                 value=subsubchapter['content'],
-                                                height=150,
+                                                height=300,
                                                 key=f"subcontent_{i}_{j}"
                                             )
                                         
@@ -356,7 +411,7 @@ else:
                                             st.text_area(
                                                 "Prüfbericht",
                                                 value=subreport_value,
-                                                height=150,
+                                                height=300,
                                                 key=f"subreport_{i}_{j}"
                                             )
                                             

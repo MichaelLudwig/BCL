@@ -184,7 +184,7 @@ class OpenAIAPI:
             response = self.client.chat.completions.create(
                 model=self.model,
                 temperature=0.1,
-                max_tokens=10000,
+                max_tokens=15000,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
@@ -225,7 +225,11 @@ class OpenAIAPI:
             
             # Parse die JSON-Antwort in das Pydantic Model
             try:
-                result = json.loads(response.choices[0].message.content)
+                content = response.choices[0].message.content
+                # Entferne Markdown-Code-Block-Formatierung falls vorhanden
+                if content.startswith("```json"):
+                    content = content.replace("```json", "").replace("```", "").strip()
+                result = json.loads(content)
             except json.JSONDecodeError as e:
                 return {
                     "error": "Die KI-Antwort enthielt kein gültiges JSON-Format",
@@ -259,7 +263,11 @@ Verwendete Quellen:
             return {
                 "reports": reports,
                 "citations": response.choices[0].message.context.get("citations", []),
-                "debug_info": debug_info
+                "debug_info": debug_info,
+                "usage": {
+                    "prompt_tokens": response.usage.prompt_tokens,
+                    "completion_tokens": response.usage.completion_tokens
+                }
             }
             
         except Exception as e:
