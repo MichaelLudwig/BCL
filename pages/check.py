@@ -202,7 +202,7 @@ else:
                 doc_info = openai_api.extract_document_info(content)
                 
                 # Anzeige der extrahierten Informationen
-                with st.expander("Dokumentinformationen", expanded=False):
+                with st.expander("Dokumentinformationen", expanded=True):
                     col1, col2 = st.columns(2)
                     with col1:
                         st.write("**Bauvorhaben:**")
