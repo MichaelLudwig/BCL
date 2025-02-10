@@ -236,7 +236,7 @@ else:
                         for i, subchapter in enumerate(chapter['subchapters']):
                             # Container für Unterkapitel mit Prüf-Button und Inhalt
                             with st.container():
-                                # Überschrift und Prüf-Button
+                                # Überschrift und Prüf-Button 
                                 col1, col2 = st.columns([3, 1])
                                 with col1:
                                     chapter_title = f"{subchapter['number']} {subchapter['title']}" if subchapter.get('number') else subchapter['title']
@@ -347,23 +347,13 @@ else:
                                             height=300,
                                             key=f"mainreport_{i}"
                                         )
-                                        
-                                        # Zeige Citations für Hauptkapitel
-                                        if 'chapters_data' in st.session_state and \
-                                           subchapter['title'] in st.session_state['chapters_data'] and \
-                                           'subchapter_reports' in st.session_state['chapters_data'][subchapter['title']]:
-                                            main_key = f"{i}_main"
-                                            if main_key in st.session_state['chapters_data'][subchapter['title']]['subchapter_reports']:
-                                                with st.expander("Verwendete Quellen", expanded=False):
-                                                    st.json(st.session_state['chapters_data'][subchapter['title']]['subchapter_reports'][main_key]['citations'])
-                                
-                                # Unter-Unterkapitel
+
+                                # Zeige Unterkapitel
                                 for j, subsubchapter in enumerate(subchapter['subchapters']):
-                                    subchapter_title = f"{subsubchapter['number']} {subsubchapter['title']}" if subsubchapter['number'] else subsubchapter['title']
-                                    st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;**{subchapter_title}**")
-                                    
-                                    # Nur wenn das Unter-Unterkapitel Inhalt hat, zeigen wir die Textfelder an
                                     if subsubchapter['content'].strip():
+                                        subchapter_title = f"{subsubchapter['number']} {subsubchapter['title']}" if subsubchapter['number'] else subsubchapter['title']
+                                        st.markdown(f"&nbsp;&nbsp;&nbsp;&nbsp;**{subchapter_title}**")
+                                        
                                         sub_content_col, sub_report_col = st.columns([1, 1])
                                         
                                         with sub_content_col:
@@ -390,15 +380,21 @@ else:
                                                 height=300,
                                                 key=f"subreport_{i}_{j}"
                                             )
-                                            
-                                            # Zeige Citations für Unterkapitel
-                                            if 'chapters_data' in st.session_state and \
-                                               subchapter['title'] in st.session_state['chapters_data'] and \
-                                               'subchapter_reports' in st.session_state['chapters_data'][subchapter['title']]:
-                                                subchapter_key = f"{i}_{j}"
-                                                if subchapter_key in st.session_state['chapters_data'][subchapter['title']]['subchapter_reports']:
-                                                    with st.expander("Verwendete Quellen", expanded=False):
-                                                        st.json(st.session_state['chapters_data'][subchapter['title']]['subchapter_reports'][subchapter_key]['citations'])
+                                
+                                # Zeige die verwendeten Quellen am Ende des Kapitels
+                                if 'chapters_data' in st.session_state and \
+                                   subchapter['title'] in st.session_state['chapters_data'] and \
+                                   'subchapter_reports' in st.session_state['chapters_data'][subchapter['title']] and \
+                                   any(report.get('citations') for report in st.session_state['chapters_data'][subchapter['title']]['subchapter_reports'].values()):
+                                    with st.expander("Verwendete Quellen", expanded=False):
+                                        # Sammle alle eindeutigen Zitate
+                                        all_citations = []
+                                        for report in st.session_state['chapters_data'][subchapter['title']]['subchapter_reports'].values():
+                                            if report.get('citations'):
+                                                all_citations.extend(report['citations'])
+                                        # Entferne Duplikate und zeige die Quellen
+                                        unique_citations = list({str(citation): citation for citation in all_citations}.values())
+                                        st.json(unique_citations)
                                 
                                 st.markdown("---")  # Trennlinie zwischen den Kapiteln
                     
