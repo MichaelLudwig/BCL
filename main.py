@@ -115,8 +115,10 @@ if user_prompt:
         st.markdown(assistant_response)
         st.text("Prompt Token: " + str(response.usage.prompt_tokens) + " Response Token: " + str(response.usage.completion_tokens))
         
-        # Zeige Suchergebnisse und Scores
-        st.json(response.choices[0].message.context)
+        # Zeige Suchergebnisse und Scores in einem aufklappbaren Bereich
+        if response.choices[0].message.context.get('citations'):
+            with st.expander("Verwendete Quellen", expanded=False):
+                st.json(response.choices[0].message.context.get('citations'))
 
 
 
