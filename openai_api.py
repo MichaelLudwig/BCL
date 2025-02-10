@@ -142,7 +142,7 @@ class OpenAIAPI:
             response = self.client.chat.completions.create(
                 model=self.model,
                 temperature=0.1,
-                max_tokens=4000,
+                max_tokens=10000,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
@@ -157,7 +157,7 @@ class OpenAIAPI:
                                 "authentication": {
                                     "type": "system_assigned_managed_identity"
                                 },
-                                "top_k": 8,
+                                "top_k": 5,
                                 "fields_mapping": {
                                     "content_field": "chunk",
                                     "vector_fields": ["text_vector"],
@@ -166,7 +166,7 @@ class OpenAIAPI:
                                 },
                                 "hybrid_search": {
                                     "fields": ["text_vector"],
-                                    "k": 8
+                                    "k": 5
                                 }
                             }
                         }
