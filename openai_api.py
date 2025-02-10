@@ -181,6 +181,8 @@ class OpenAIAPI:
                 "key": os.getenv('AZURE_SEARCH_KEY')
             }
 
+            print(f"Verwende Authentifizierung: {search_auth['type']}")  # Debug-Ausgabe
+            
             response = self.client.chat.completions.create(
                 model=self.model,
                 temperature=0.1,
@@ -215,11 +217,21 @@ class OpenAIAPI:
                 }
             )
             
+            # Debug-Ausgaben
+            print(f"OpenAI Response Status: {response.model_dump_json()}")
+            print(f"Response Content: {response.choices[0].message.content if response.choices else 'Keine Antwort'}")
+            
             # Parse die JSON-Antwort in das Pydantic Model
-            result = json.loads(response.choices[0].message.content)
+            try:
+                result = json.loads(response.choices[0].message.content)
+            except json.JSONDecodeError as e:
+                print(f"JSON Parsing Error: {str(e)}")
+                print(f"Problematischer Content: {response.choices[0].message.content}")
+                raise Exception(f"Ungültiges JSON-Format in der Antwort: {str(e)}")
+                
             if not isinstance(result, list):
                 result = [result]  # Fallback für den Fall, dass nur ein Bericht zurückgegeben wird
-                
+            
             pruefberichte = [Pruefbericht(**report) for report in result]
             
             # Formatiere die Prüfberichte als Text
@@ -247,4 +259,7 @@ Verwendete Quellen:
             }
             
         except Exception as e:
+            print(f"Fehler in check_chapter: {str(e)}")  # Debug-Ausgabe
+            if hasattr(e, 'response'):
+                print(f"API Response: {e.response}")  # Debug-Ausgabe
             raise Exception(f"Fehler bei der Prüfung der Unterkapitel: {str(e)}") 
