@@ -113,9 +113,9 @@ def extract_document_content(file):
         st.session_state['chapter_structure'] = chapter_structure
         
         # Debug-Ausgabe der Kapitelstruktur
-        st.write("### Kapitelstruktur: Brandschutztechnisches Gesamtkonzept")
-        with st.expander("Kapitelstruktur anzeigen"):
-            st.json(chapter_structure)
+        # st.write("### Kapitelstruktur: Brandschutztechnisches Gesamtkonzept")
+        # with st.expander("Kapitelstruktur anzeigen"):
+        #     st.json(chapter_structure)
         
         # Text aus dem Dokument extrahieren
         content = ""
@@ -194,8 +194,8 @@ else:
         content = extract_document_content(uploaded_file)
         if content:
             # Debug-Ausgabe des extrahierten Contents
-            with st.expander("Debug: Content anzeigen", expanded=False):
-                st.code(content, language="text")
+            # with st.expander("Debug: Content anzeigen", expanded=False):
+            #     st.code(content, language="text")
             
             try:
                 # OpenAI API aufrufen
