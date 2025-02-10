@@ -50,6 +50,7 @@ class OpenAIAPI:
                 azure_endpoint="https://ai-service-BCL-app.openai.azure.com/"        
             )
         else:
+            # Lokale Entwicklungsumgebung - API Key
             self.client = openai.AzureOpenAI(
                 api_key=os.getenv('AZURE_OPENAI_SW_API_KEY'),
                 api_version="2024-04-01-preview",
@@ -173,7 +174,10 @@ class OpenAIAPI:
         """
         
         try:
-            # Authentifizierungskonfiguration basierend auf Environment
+            # Prüfe, ob die notwendigen Authentifizierungsinformationen vorhanden sind
+            if not self.use_managed_identity and not os.getenv('AZURE_SEARCH_KEY'):
+                raise ValueError("Keine Authentifizierung für Azure Cognitive Search konfiguriert. Bitte AZURE_SEARCH_KEY setzen oder Managed Identity aktivieren.")
+
             search_auth = {
                 "type": "system_assigned_managed_identity"
             } if self.use_managed_identity else {
