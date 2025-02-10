@@ -99,7 +99,7 @@ class OpenAIAPI:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.3,
+                temperature=0.1,
                 response_format={"type": "json_object"}
             )
             
@@ -219,8 +219,7 @@ class OpenAIAPI:
             debug_info = {
                 "response_status": response.model_dump_json(),
                 "raw_content": response.choices[0].message.content if response.choices else None,
-                "context": response.choices[0].message.context if response.choices else None,
-                "auth_type": search_auth["type"]
+                "auth_type": "managed_identity" if self.use_managed_identity else "api_key"
             }
             
             # Parse die JSON-Antwort in das Pydantic Model
@@ -274,7 +273,7 @@ Verwendete Quellen:
             debug_info = {
                 "error_type": type(e).__name__,
                 "error_message": str(e),
-                "auth_type": search_auth["type"]
+                "auth_type": "managed_identity" if self.use_managed_identity else "api_key"
             }
             return {
                 "error": f"Fehler bei der Prüfung der Unterkapitel: {str(e)}",

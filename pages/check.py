@@ -39,10 +39,6 @@ def extract_chapter_structure(doc: docx.Document) -> Dict[str, Any]:
                 
         text = paragraph.text.strip()
         
-        # Debug-Ausgabe für Überschriften
-        if level > 0:
-            print(f"Found heading level {level}: {text}")
-        
         # Hauptkapitel "Brandschutztechnisches Gesamtkonzept" finden
         if level == 1 and "brandschutztechnisches gesamtkonzept" in text.lower():
             in_brandschutz_chapter = True
@@ -66,8 +62,6 @@ def extract_chapter_structure(doc: docx.Document) -> Dict[str, Any]:
                     chapter_number = number_match.group(1)
                     title = number_match.group(3)
                 
-                print(f"Found subchapter: number='{chapter_number}', title='{title}'")
-                
                 current_subchapter = {
                     "number": chapter_number,
                     "title": title,
@@ -87,8 +81,6 @@ def extract_chapter_structure(doc: docx.Document) -> Dict[str, Any]:
                         chapter_number = number_match.group(1)
                         title = number_match.group(3)
                     
-                    print(f"Found subsubchapter: number='{chapter_number}', title='{title}'")
-                    
                     current_subchapter["subchapters"].append({
                         "number": chapter_number,
                         "title": title,
@@ -103,18 +95,6 @@ def extract_chapter_structure(doc: docx.Document) -> Dict[str, Any]:
                     current_subchapter["content"] += text + "\n"
                 elif chapter_level == 3 and current_subchapter and current_subchapter["subchapters"]:
                     current_subchapter["subchapters"][-1]["content"] += text + "\n"
-    
-    # Debug-Ausgabe der extrahierten Struktur 
-    print("\nExtracted chapter structure:")
-    if chapters and chapters[0]:
-        for subchapter in chapters[0]["subchapters"]:
-            print(f"- {subchapter['number']} {subchapter['title']}")
-            if subchapter["content"]:
-                print(f"  Content: {subchapter['content'][:100]}...")
-            for subsubchapter in subchapter["subchapters"]:
-                print(f"  - {subsubchapter['number']} {subsubchapter['title']}")
-                if subsubchapter["content"]:
-                    print(f"    Content: {subsubchapter['content'][:100]}...")
     
     return {"brandschutzkonzept": chapters[0] if chapters else None}
 
@@ -328,8 +308,7 @@ else:
                                                         else:
                                                             # Dies ist ein Unterkapitel
                                                             subchapter_key = f"{i}_{j-1}"  # -1 weil das Hauptkapitel bereits gezählt wurde
-                                                        
-                                                        st.write(f"Debug - Speichere Bericht für: {chapter['title']} mit Schlüssel: {subchapter_key}")
+                                                    
                                                         
                                                         st.session_state['chapters_data'][chapter_key]['subchapter_reports'][subchapter_key] = {
                                                             'report': report,
