@@ -60,7 +60,7 @@ class OpenAIAPI:
         self.model = "gpt-4o-mini"
         self.use_managed_identity = os.getenv('WEBSITE_INSTANCE_ID', False)
 
-    def extract_document_info(self, content: str) -> Dokumenteninfo:
+    def extract_document_info(self, content: str, search_filter: str = None) -> Dokumenteninfo:
         """Extrahiert Dokumentinformationen aus dem Inhalt mittels Azure OpenAI"""
         system_prompt = """
         Du bist ein Experte für die Analyse von Baudokumenten. Deine Aufgabe ist es, die angeforderten Informationen aus dem Dokument zu extrahieren
@@ -128,7 +128,7 @@ class OpenAIAPI:
         except Exception as e:
             raise Exception(f"Fehler bei der Verarbeitung der OpenAI-Antwort: {str(e)}")
 
-    def check_chapter(self, chapter_content: List[Dict[str, str]], doc_info: Dokumenteninfo) -> Dict[str, Any]:
+    def check_chapter(self, chapter_content: List[Dict[str, str]], doc_info: Dokumenteninfo, search_filter: str = None) -> Dict[str, Any]:
         """Prüft alle Unterkapitel des Brandschutzkonzepts in einer Anfrage"""
         
         system_prompt = """Du bist ein Experte für Brandschutz und die Prüfung von Brandschutzkonzepten.
@@ -174,10 +174,15 @@ class OpenAIAPI:
         """
         
         try:
+            # Initialisiere debug_info
+            debug_info = {
+                "auth_type": "managed_identity" if self.use_managed_identity else "api_key"
+            }
+            
             # Prüfe, ob die notwendigen Authentifizierungsinformationen vorhanden sind
             if not self.use_managed_identity and not os.getenv('AZURE_SEARCH_KEY'):
                 raise ValueError("Keine Authentifizierung für Azure Cognitive Search konfiguriert. Bitte AZURE_SEARCH_KEY setzen oder Managed Identity aktivieren.")
-
+            
             search_auth = {
                 "type": "system_assigned_managed_identity"
             } if self.use_managed_identity else {
@@ -185,6 +190,7 @@ class OpenAIAPI:
                 "key": os.getenv('AZURE_SEARCH_KEY')
             }
 
+           
             response = self.client.chat.completions.create(
                 model=self.model,
                 temperature=0.1,
@@ -202,7 +208,7 @@ class OpenAIAPI:
                                 "endpoint": "https://searchbclapp.search.windows.net",
                                 "index_name": "bcl-data2",
                                 "authentication": search_auth,
-                                "top_k": 4,
+                                # "top_k": 2,
                                 "fields_mapping": {
                                     "content_field": "chunk",
                                     "vector_fields": ["text_vector"],
@@ -211,20 +217,21 @@ class OpenAIAPI:
                                 },
                                 "hybrid_search": {
                                     "fields": ["text_vector"],
-                                    "k": 4
-                                }
+                                    "k": 2
+                                },
+                                "filter": search_filter if search_filter else None
                             }
                         }
                     ]
                 }
             )
             
-            # Debug-Informationen sammeln
-            debug_info = {
+            # Debug-Informationen aktualisieren
+            debug_info.update({
                 "response_status": response.model_dump_json(),
                 "raw_content": response.choices[0].message.content if response.choices else None,
-                "auth_type": "managed_identity" if self.use_managed_identity else "api_key"
-            }
+                "search_context": response.choices[0].message.context if response.choices else None
+            })
             
             # Parse die JSON-Antwort in das Pydantic Model
             try:
