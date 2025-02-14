@@ -208,11 +208,13 @@ class OpenAIAPI:
                                 "endpoint": "https://searchbclapp.search.windows.net",
                                 "index_name": "bcl-data2",
                                 "authentication": search_auth,
+                                "top_n_documents": 4,
                                 # "top_k": 2,
                                 "fields_mapping": {
                                     "content_field": "chunk",
                                     "vector_fields": ["text_vector"],
                                     "title_field": "title",
+                                    "filepath_field": "filepath",
                                     "metadata_fields": ["Bundesland", "Baukategorie"]
                                 },
                                 "hybrid_search": {
